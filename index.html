@@ -4,240 +4,593 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>🌸 Inkubator Telur Monitor 🥚</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --pink-light:#ffe3ef;
     --pink-mid:#ffb6d0;
     --pink-deep:#ff7fac;
     --pink-dark:#e84a8a;
-    --cream:#fff6f2;
+    --peach:#ffe9dc;
+    --cream:#fff8f5;
+    --card-bg:rgba(255, 255, 255, 0.68);
+    --card-border:rgba(255, 182, 208, 0.85);
+    --stat-bg:rgba(255, 248, 245, 0.85);
     --text:#5a3346;
-    --green-ok:#6fcf97;
+    --text-muted:rgba(90, 51, 70, 0.72);
+    --shadow-color:rgba(232, 74, 138, 0.14);
+    --green-ok:#52c484;
     --red-alarm:#ff5c6c;
+    --amber-heat:#ff9f43;
   }
+
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --pink-light:#3a2230;
-      --pink-mid:#5c2f45;
+      --pink-light:#2b1924;
+      --pink-mid:#633049;
       --pink-deep:#ff7fac;
-      --pink-dark:#ff9cc3;
-      --cream:#2a1b22;
-      --text:#ffe3ef;
+      --pink-dark:#ffa3c8;
+      --peach:#35202b;
+      --cream:#1e1319;
+      --card-bg:rgba(43, 25, 36, 0.72);
+      --card-border:rgba(255, 127, 172, 0.32);
+      --stat-bg:rgba(30, 19, 25, 0.75);
+      --text:#ffe6f0;
+      --text-muted:rgba(255, 230, 240, 0.72);
+      --shadow-color:rgba(0, 0, 0, 0.35);
     }
   }
+
   :root[data-theme="dark"]{
-    --pink-light:#3a2230;
-    --pink-mid:#5c2f45;
+    --pink-light:#2b1924;
+    --pink-mid:#633049;
     --pink-deep:#ff7fac;
-    --pink-dark:#ff9cc3;
-    --cream:#2a1b22;
-    --text:#ffe3ef;
+    --pink-dark:#ffa3c8;
+    --peach:#35202b;
+    --cream:#1e1319;
+    --card-bg:rgba(43, 25, 36, 0.72);
+    --card-border:rgba(255, 127, 172, 0.32);
+    --stat-bg:rgba(30, 19, 25, 0.75);
+    --text:#ffe6f0;
+    --text-muted:rgba(255, 230, 240, 0.72);
+    --shadow-color:rgba(0, 0, 0, 0.35);
   }
 
-  *{box-sizing:border-box;}
-  html,body{
+  *{ box-sizing:border-box; }
+
+  html, body{
     margin:0;
-    height:100%;
-    font-family:'Segoe UI', 'Trebuchet MS', sans-serif;
-    background:linear-gradient(160deg,var(--pink-light),var(--cream));
+    min-height:100%;
+    font-family:'Quicksand', 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(circle at 12% 15%, rgba(255, 127, 172, 0.24), transparent 42%),
+      radial-gradient(circle at 88% 80%, rgba(255, 182, 208, 0.28), transparent 45%),
+      linear-gradient(155deg, var(--pink-light) 0%, var(--peach) 50%, var(--cream) 100%);
+    background-attachment:fixed;
     color:var(--text);
     overflow-x:hidden;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
+    padding-top:env(safe-area-inset-top, 0px);
+    padding-bottom:env(safe-area-inset-bottom, 0px);
+    transition:background 0.4s ease, color 0.3s ease;
   }
-  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html{ scroll-padding-top:env(safe-area-inset-top, 0px); }
 
-  /* ---------- Background decor: sakura petals + cute eggs ---------- */
+  /* ---------- Background decor: sakura petals + floating eggs ---------- */
   .bg-decor{
     position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
   }
   .petal{
     position:absolute; top:-10%;
-    width:18px; height:18px;
-    background:var(--pink-deep);
+    background:linear-gradient(135deg, #ffc2d9, var(--pink-deep));
     border-radius:0 100% 0 100%;
-    opacity:.55;
-    animation:fall linear infinite;
+    box-shadow:0 2px 6px rgba(255, 127, 172, 0.25);
+    animation:fallSway linear infinite;
   }
-  @keyframes fall{
-    0%{ transform:translateY(0) translateX(0) rotate(0deg); }
-    100%{ transform:translateY(110vh) translateX(40px) rotate(260deg); }
+  @keyframes fallSway{
+    0%{
+      transform:translateY(0) translateX(0) rotate(0deg) scale(1);
+    }
+    50%{
+      transform:translateY(55vh) translateX(35px) rotate(160deg) scale(0.92);
+    }
+    100%{
+      transform:translateY(112vh) translateX(-15px) rotate(320deg) scale(1);
+    }
   }
+
   .egg-bg{
     position:absolute;
     opacity:.16;
-    filter:blur(0.2px);
+    animation:eggFloat 7s ease-in-out infinite;
+  }
+  @keyframes eggFloat{
+    0%, 100%{ transform:translateY(0) rotate(var(--rot, 0deg)); }
+    50%{ transform:translateY(-12px) rotate(calc(var(--rot, 0deg) + 5deg)); }
   }
 
-  /* ---------- Layout ---------- */
+  /* Click sparkle particle */
+  .click-sparkle{
+    position:fixed;
+    pointer-events:none;
+    z-index:999;
+    font-size:14px;
+    animation:sparklePop 0.75s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes sparklePop{
+    0%{ opacity:1; transform:translate(-50%, -50%) scale(0.5); }
+    100%{ opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.25); }
+  }
+
+  /* ---------- Layout & Header ---------- */
   .wrap{
     position:relative; z-index:1;
-    max-width:780px;
+    max-width:760px;
     margin:0 auto;
-    padding:28px 18px 60px;
+    padding:24px 18px 64px;
   }
+
+  .top-bar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:4px;
+  }
+  .theme-toggle{
+    background:var(--card-bg);
+    color:var(--pink-dark);
+    border:1.5px solid var(--card-border);
+    border-radius:999px;
+    padding:6px 14px;
+    font-family:inherit;
+    font-size:.82rem;
+    font-weight:700;
+    cursor:pointer;
+    backdrop-filter:blur(8px);
+    box-shadow:0 4px 12px var(--shadow-color);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .theme-toggle:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 16px var(--shadow-color);
+  }
+
   header{
     text-align:center;
-    margin-bottom:22px;
+    margin-bottom:24px;
+    animation:fadeSlideDown 0.6s ease both;
   }
+  @keyframes fadeSlideDown{
+    from{ opacity:0; transform:translateY(-14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .mascot-wrap{
+    display:inline-block;
+    cursor:pointer;
+    user-select:none;
+    margin-bottom:6px;
+  }
+  .egg-mascot{
+    width:64px;
+    display:block;
+    margin:0 auto;
+    filter:drop-shadow(0 6px 12px rgba(232, 74, 138, 0.22));
+    animation:mascotWobble 3.5s ease-in-out infinite;
+    transition:transform 0.25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .mascot-wrap:hover .egg-mascot{
+    transform:scale(1.1) rotate(-4deg);
+  }
+  .mascot-wrap.happy .egg-mascot{
+    animation:mascotJump 0.55s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes mascotWobble{
+    0%, 100%{ transform:rotate(-3deg) translateY(0); }
+    50%{ transform:rotate(3deg) translateY(-4px); }
+  }
+  @keyframes mascotJump{
+    0%{ transform:scale(1) translateY(0); }
+    40%{ transform:scale(1.18, 0.9) translateY(-12px); }
+    75%{ transform:scale(0.95, 1.06) translateY(2px); }
+    100%{ transform:scale(1) translateY(0); }
+  }
+
   header h1{
     margin:0;
-    font-size:1.7rem;
+    font-size:1.78rem;
+    font-weight:700;
+    letter-spacing:-0.3px;
     color:var(--pink-dark);
-    text-shadow:0 1px 0 rgba(255,255,255,.5);
+    text-shadow:0 2px 10px rgba(255, 127, 172, 0.25);
   }
   header p{
     margin:6px 0 0;
-    font-size:.92rem;
-    opacity:.8;
-  }
-  .egg-mascot{
-    width:56px;
-    display:block;
-    margin:0 auto 6px;
+    font-size:.94rem;
+    font-weight:500;
+    color:var(--text-muted);
   }
 
+  /* ---------- Cards ---------- */
   .card{
-    background:rgba(255,255,255,0.55);
-    border:2px solid var(--pink-mid);
-    border-radius:22px;
-    padding:18px 20px;
+    background:var(--card-bg);
+    border:1.5px solid var(--card-border);
+    border-radius:24px;
+    padding:20px 22px;
     margin-bottom:18px;
-    box-shadow:0 6px 18px rgba(232,74,138,.12);
-    backdrop-filter:blur(6px);
+    box-shadow:
+      0 10px 28px var(--shadow-color),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.3s ease;
+    animation:cardFadeUp 0.6s cubic-bezier(.16,1,.3,1) both;
   }
-  :root[data-theme="dark"] .card, @media (prefers-color-scheme: dark){ .card{ background:rgba(0,0,0,0.18); } }
+  .card:nth-of-type(1){ animation-delay:0.06s; }
+  .card:nth-of-type(2){ animation-delay:0.14s; }
+  .card:nth-of-type(3){ animation-delay:0.22s; }
+  .card:nth-of-type(4){ animation-delay:0.30s; }
+
+  @keyframes cardFadeUp{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .card:hover{
+    transform:translateY(-3px);
+    box-shadow:
+      0 14px 32px var(--shadow-color),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
 
   .card h2{
-    margin:0 0 12px;
-    font-size:1.05rem;
+    margin:0 0 14px;
+    font-size:1.06rem;
+    font-weight:700;
     color:var(--pink-dark);
     display:flex; align-items:center; gap:8px;
   }
 
-  /* ---------- Fan control (main feature) ---------- */
+  /* ---------- Fan Control ---------- */
   .fan-card{
     text-align:center;
-    border-width:3px;
-  }
-  .fan-visual{
-    width:120px; height:120px;
-    margin:4px auto 14px;
+    border-width:2px;
     position:relative;
+    overflow:hidden;
   }
-  .fan-visual svg{ width:100%; height:100%; transform-origin:50% 50%; }
-  .fan-spin{ animation:spin linear infinite; animation-duration:4s; }
+  .fan-card::before{
+    content:"";
+    position:absolute;
+    top:-60px; left:50%; transform:translateX(-50%);
+    width:220px; height:220px;
+    background:radial-gradient(circle, rgba(255, 127, 172, 0.22), transparent 70%);
+    pointer-events:none;
+  }
 
-  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  .fan-visual{
+    width:130px; height:130px;
+    margin:6px auto 14px;
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fan-ring{
+    position:absolute;
+    inset:4px;
+    border-radius:50%;
+    border:2px dashed var(--pink-deep);
+    opacity:0;
+    pointer-events:none;
+  }
+  .fan-visual.active .fan-ring{
+    animation:windRipple 1.8s ease-out infinite;
+  }
+  @keyframes windRipple{
+    0%{ transform:scale(0.85); opacity:0.65; }
+    100%{ transform:scale(1.28); opacity:0; }
+  }
+
+  .fan-visual svg{
+    width:112px; height:112px;
+    transform-origin:50% 50%;
+    filter:drop-shadow(0 4px 10px rgba(232, 74, 138, 0.2));
+  }
+  .fan-spin{
+    animation:spin linear infinite;
+    animation-duration:0s;
+  }
+  @keyframes spin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
+  }
 
   .speed-readout{
-    font-size:2.2rem;
+    font-size:2.35rem;
     font-weight:700;
     color:var(--pink-dark);
-    margin:4px 0 14px;
+    margin:2px 0 12px;
+    line-height:1.1;
   }
+
+  /* Custom Range Slider */
   input[type=range]{
+    -webkit-appearance:none;
+    appearance:none;
     width:100%;
-    accent-color:var(--pink-deep);
-    height:8px;
+    height:10px;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--pink-deep) var(--fill, 0%), rgba(255, 182, 208, 0.45) var(--fill, 0%));
+    outline:none;
+    cursor:pointer;
+    transition:box-shadow 0.2s;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:24px; height:24px;
+    border-radius:50%;
+    background:#fff;
+    border:4px solid var(--pink-dark);
+    box-shadow:0 3px 10px rgba(232, 74, 138, 0.35);
+    cursor:pointer;
+    transition:transform 0.15s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{
+    transform:scale(1.15);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px; height:22px;
+    border-radius:50%;
+    background:#fff;
+    border:4px solid var(--pink-dark);
+    box-shadow:0 3px 10px rgba(232, 74, 138, 0.35);
     cursor:pointer;
   }
+
   .slider-labels{
     display:flex; justify-content:space-between;
-    font-size:.78rem; opacity:.7; margin-top:4px;
-  }
-  .hint{
-    font-size:.78rem; opacity:.65; margin-top:10px;
+    font-size:.78rem; font-weight:600; color:var(--text-muted); margin-top:6px;
   }
 
-  /* ---------- Monitoring grid ---------- */
+  .preset-row{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+  }
+  .preset-btn{
+    background:var(--stat-bg);
+    color:var(--pink-dark);
+    border:1.5px solid var(--pink-mid);
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:700;
+    box-shadow:none;
+  }
+  .preset-btn:hover{
+    background:var(--pink-deep);
+    color:#fff;
+    border-color:var(--pink-deep);
+  }
+
+  .hint{
+    font-size:.8rem;
+    line-height:1.45;
+    color:var(--text-muted);
+    margin-top:12px;
+  }
+
+  /* ---------- Monitoring Grid ---------- */
   .grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2, 1fr);
     gap:14px;
   }
-  @media(max-width:480px){ .grid{ grid-template-columns:1fr 1fr; gap:10px; } }
+  @media(max-width:480px){
+    .grid{ gap:10px; }
+  }
 
   .stat{
-    background:var(--cream);
-    border-radius:16px;
-    padding:14px;
+    background:var(--stat-bg);
+    border-radius:18px;
+    padding:16px 14px;
     text-align:center;
-    border:1px solid var(--pink-mid);
+    border:1.5px solid var(--card-border);
+    position:relative;
+    overflow:hidden;
+    transition:transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
-  .stat .label{ font-size:.75rem; opacity:.75; }
-  .stat .value{ font-size:1.5rem; font-weight:700; color:var(--pink-dark); margin-top:2px; }
-  .stat .unit{ font-size:.8rem; font-weight:400; opacity:.7; }
+  .stat:hover{
+    transform:translateY(-2px);
+    border-color:var(--pink-deep);
+  }
+  .stat.heater-active{
+    border-color:var(--amber-heat);
+    box-shadow:0 0 18px rgba(255, 159, 67, 0.25);
+  }
+  .stat .label{
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--text-muted);
+  }
+  .stat .value{
+    font-size:1.6rem;
+    font-weight:700;
+    color:var(--pink-dark);
+    margin-top:4px;
+    display:inline-block;
+    transition:transform 0.25s ease;
+  }
+  .stat .value.updated{
+    animation:valuePop 0.4s ease;
+  }
+  @keyframes valuePop{
+    0%{ transform:scale(1); }
+    45%{ transform:scale(1.12); color:var(--pink-deep); }
+    100%{ transform:scale(1); }
+  }
+  .stat .unit{
+    font-size:.85rem;
+    font-weight:600;
+    opacity:.75;
+  }
 
   .badge{
     display:inline-block;
-    padding:4px 14px;
+    padding:5px 16px;
     border-radius:999px;
-    font-size:.85rem;
-    font-weight:600;
+    font-size:.86rem;
+    font-weight:700;
+    letter-spacing:0.3px;
+    transition:all 0.3s ease;
   }
-  .badge.on{ background:var(--green-ok); color:#fff; }
-  .badge.off{ background:#ccc; color:#555; }
-  .badge.alarm{ background:var(--red-alarm); color:#fff; animation:pulse 1s infinite; }
-  .badge.safe{ background:var(--green-ok); color:#fff; }
-  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
+  .badge.on{
+    background:linear-gradient(135deg, #6fcf97, #48b878);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(82, 196, 132, 0.35);
+  }
+  .badge.off{
+    background:rgba(160, 145, 153, 0.25);
+    color:var(--text-muted);
+  }
+  .badge.alarm{
+    background:linear-gradient(135deg, #ff6b7a, #e83e52);
+    color:#fff;
+    box-shadow:0 4px 16px rgba(255, 92, 108, 0.45);
+    animation:pulse 1s infinite;
+  }
+  .badge.safe{
+    background:linear-gradient(135deg, #6fcf97, #48b878);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(82, 196, 132, 0.3);
+  }
+  @keyframes pulse{
+    0%, 100%{ transform:scale(1); opacity:1; }
+    50%{ transform:scale(1.05); opacity:.78; }
+  }
 
-  /* ---------- Setpoint ---------- */
+  .card.alarm-active{
+    border-color:var(--red-alarm);
+    box-shadow:0 0 24px rgba(255, 92, 108, 0.28);
+  }
+
+  /* ---------- Setpoint & Buttons ---------- */
   .setpoint-row{
     display:flex; align-items:center; gap:10px; flex-wrap:wrap;
   }
   .setpoint-row input[type=number]{
-    width:90px;
-    padding:8px 10px;
-    border-radius:12px;
+    width:96px;
+    padding:9px 12px;
+    border-radius:14px;
     border:2px solid var(--pink-mid);
-    font-size:1rem;
+    font-family:inherit;
+    font-size:1.05rem;
+    font-weight:700;
     text-align:center;
-    background:var(--cream);
+    background:var(--stat-bg);
     color:var(--text);
+    outline:none;
+    transition:border-color 0.2s, box-shadow 0.2s;
   }
+  .setpoint-row input[type=number]:focus{
+    border-color:var(--pink-dark);
+    box-shadow:0 0 0 3px rgba(255, 127, 172, 0.25);
+  }
+
   button{
-    background:var(--pink-deep);
+    background:linear-gradient(135deg, var(--pink-deep), var(--pink-dark));
     color:#fff;
     border:none;
-    padding:9px 18px;
+    padding:10px 20px;
     border-radius:14px;
-    font-size:.9rem;
-    font-weight:600;
+    font-family:inherit;
+    font-size:.92rem;
+    font-weight:700;
     cursor:pointer;
-    transition:transform .15s;
+    box-shadow:0 4px 14px rgba(232, 74, 138, 0.28);
+    transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
   }
-  button:hover{ transform:translateY(-1px); }
-  button:active{ transform:scale(.96); }
+  button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(232, 74, 138, 0.38);
+    filter:brightness(1.04);
+  }
+  button:active{
+    transform:scale(.96);
+  }
 
+  /* ---------- Footer & Toast ---------- */
   .status-footer{
     text-align:center;
-    font-size:.75rem;
-    opacity:.6;
-    margin-top:10px;
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--text-muted);
+    margin-top:14px;
   }
   .dot{
-    display:inline-block; width:8px; height:8px; border-radius:50%;
-    background:var(--green-ok); margin-right:5px;
+    display:inline-block; width:9px; height:9px; border-radius:50%;
+    background:var(--green-ok); margin-right:6px;
+    box-shadow:0 0 8px var(--green-ok);
+    animation:dotPulse 2s infinite;
   }
-  .dot.off{ background:#bbb; }
+  .dot.off{
+    background:#bbb;
+    box-shadow:none;
+    animation:none;
+  }
+  @keyframes dotPulse{
+    0%, 100%{ opacity:1; }
+    50%{ opacity:0.45; }
+  }
+
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--pink-dark);
+    color:#fff;
+    padding:10px 20px;
+    border-radius:999px;
+    font-size:.86rem;
+    font-weight:700;
+    box-shadow:0 8px 24px rgba(232, 74, 138, 0.35);
+    opacity:0;
+    pointer-events:none;
+    z-index:100;
+    transition:opacity 0.25s ease, transform 0.25s cubic-bezier(.16,1,.3,1);
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
 </style>
 </head>
 <body>
 
 <div class="bg-decor" id="bgDecor"></div>
+<div class="toast" id="toast">Tersimpan!</div>
 
 <div class="wrap">
 
+  <div class="top-bar">
+    <button class="theme-toggle" id="themeToggle" type="button" title="Ganti Tema Terang/Gelap">🌙 Mode Gelap</button>
+  </div>
+
   <header>
-    <svg class="egg-mascot" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="50" cy="70" rx="42" ry="55" fill="#fff6f2" stroke="#ff7fac" stroke-width="4"/>
-      <circle cx="37" cy="62" r="4" fill="#5a3346"/>
-      <circle cx="63" cy="62" r="4" fill="#5a3346"/>
-      <path d="M38 80 Q50 90 62 80" stroke="#e84a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <circle cx="26" cy="74" r="6" fill="#ffb6d0" opacity=".7"/>
-      <circle cx="74" cy="74" r="6" fill="#ffb6d0" opacity=".7"/>
-    </svg>
+    <div class="mascot-wrap" id="mascotWrap" title="Klik aku! 🥚">
+      <svg class="egg-mascot" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="70" rx="42" ry="55" fill="#fff6f2" stroke="#ff7fac" stroke-width="4"/>
+        <circle cx="37" cy="62" r="4" fill="#5a3346"/>
+        <circle cx="63" cy="62" r="4" fill="#5a3346"/>
+        <circle cx="38.5" cy="60.5" r="1.3" fill="#fff"/>
+        <circle cx="64.5" cy="60.5" r="1.3" fill="#fff"/>
+        <path d="M38 80 Q50 90 62 80" stroke="#e84a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="26" cy="74" r="6" fill="#ffb6d0" opacity=".75"/>
+        <circle cx="74" cy="74" r="6" fill="#ffb6d0" opacity=".75"/>
+      </svg>
+    </div>
     <h1>Inkubator Telur Monitor 🌸</h1>
     <p>Kendali kecepatan kipas & pantau suhu inkubator secara real-time</p>
   </header>
@@ -246,7 +599,8 @@
   <div class="card fan-card">
     <h2>🌀 Kontrol Kecepatan Kipas Sirkulasi</h2>
 
-    <div class="fan-visual">
+    <div class="fan-visual" id="fanVisual">
+      <div class="fan-ring"></div>
       <svg id="fanSvg" class="fan-spin" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="46" fill="#ffe3ef" stroke="#ff7fac" stroke-width="3"/>
         <g fill="#ff7fac">
@@ -256,6 +610,7 @@
           <path d="M50 50 Q10 70 8 50 Q10 35 50 50 Z"/>
         </g>
         <circle cx="50" cy="50" r="9" fill="#e84a8a"/>
+        <circle cx="50" cy="50" r="3.5" fill="#fff6f2"/>
       </svg>
     </div>
 
@@ -263,6 +618,14 @@
 
     <input type="range" id="speedSlider" min="0" max="100" value="0" step="5">
     <div class="slider-labels"><span>0% (mati)</span><span>100% (maksimum)</span></div>
+
+    <div class="preset-row">
+      <button type="button" class="preset-btn" data-speed="30">30%</button>
+      <button type="button" class="preset-btn" data-speed="50">50%</button>
+      <button type="button" class="preset-btn" data-speed="75">75%</button>
+      <button type="button" class="preset-btn" data-speed="100">100%</button>
+    </div>
+
     <div class="hint">🥚 Minimal kipas tetap berputar 30% di firmware ESP32 agar panas selalu merata, walau slider ini diset lebih rendah.</div>
   </div>
 
@@ -270,7 +633,7 @@
   <div class="card">
     <h2>🎯 Setpoint Suhu Heater</h2>
     <div class="setpoint-row">
-      <input type="number" id="setpointInput" step="0.1" value="37.5"> °C
+      <input type="number" id="setpointInput" step="0.1" value="37.5"> <span style="font-weight:700;">°C</span>
       <button id="btnSetpoint">Simpan Setpoint</button>
     </div>
     <div class="hint">Heater akan menyala otomatis jika suhu ruang (DHT22) di bawah nilai ini.</div>
@@ -282,17 +645,17 @@
     <div class="grid">
       <div class="stat">
         <div class="label">Suhu Ruang (DHT22)</div>
-        <div class="value"><span id="suhuDht">--</span><span class="unit"> °C</span></div>
+        <div class="value" id="valSuhuDht"><span id="suhuDht">--</span><span class="unit"> °C</span></div>
       </div>
       <div class="stat">
         <div class="label">Kelembapan</div>
-        <div class="value"><span id="kelembapan">--</span><span class="unit"> %</span></div>
+        <div class="value" id="valKelembapan"><span id="kelembapan">--</span><span class="unit"> %</span></div>
       </div>
       <div class="stat">
         <div class="label">Suhu Thermocouple</div>
-        <div class="value"><span id="suhuMax">--</span><span class="unit"> °C</span></div>
+        <div class="value" id="valSuhuMax"><span id="suhuMax">--</span><span class="unit"> °C</span></div>
       </div>
-      <div class="stat">
+      <div class="stat" id="statHeater">
         <div class="label">Status Heater</div>
         <div class="value"><span id="badgeHeater" class="badge off">OFF</span></div>
       </div>
@@ -300,10 +663,10 @@
   </div>
 
   <!-- ===================== ALARM ===================== -->
-  <div class="card">
+  <div class="card" id="alarmCard">
     <h2>🚨 Status Keamanan</h2>
     <div style="text-align:center;">
-      <span id="badgeAlarm" class="badge safe">AMAN</span>
+      <span id="badgeAlarm" class="badge safe">AMAN 🌸</span>
     </div>
     <div class="hint" style="text-align:center;">Failsafe thermocouple berjalan lokal di ESP32 — tetap aktif walau koneksi ke halaman ini terputus.</div>
   </div>
@@ -316,10 +679,80 @@
 
 <script>
 /* =========================================================
+   THEME TOGGLE & INTERACTIVE MICRO-EFFECTS
+   ========================================================= */
+const themeToggle = document.getElementById('themeToggle');
+const rootEl = document.documentElement;
+
+function updateThemeButton(){
+  const isDark = rootEl.getAttribute('data-theme') === 'dark' ||
+    (!rootEl.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  themeToggle.textContent = isDark ? "🌸 Mode Terang" : "🌙 Mode Gelap";
+}
+updateThemeButton();
+
+themeToggle.addEventListener('click', () => {
+  const isCurrentlyDark = rootEl.getAttribute('data-theme') === 'dark' ||
+    (!rootEl.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const nextTheme = isCurrentlyDark ? 'light' : 'dark';
+  rootEl.setAttribute('data-theme', nextTheme);
+  updateThemeButton();
+});
+
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function flashValue(wrapperId, newText){
+  const el = document.getElementById(wrapperId);
+  if(!el) return;
+  const span = el.querySelector('span');
+  if(span && span.textContent !== String(newText)){
+    span.textContent = newText;
+    el.classList.remove('updated');
+    void el.offsetWidth;
+    el.classList.add('updated');
+  }
+}
+
+// Maskot telur lompat & keluarkan percikan saat diklik
+const mascotWrap = document.getElementById('mascotWrap');
+mascotWrap.addEventListener('click', (e) => {
+  mascotWrap.classList.remove('happy');
+  void mascotWrap.offsetWidth;
+  mascotWrap.classList.add('happy');
+  spawnSparkles(e.clientX, e.clientY, ['🌸', '💖', '✨', '🥚']);
+});
+
+// Efek percikan kecil saat klik di area kosong/halaman
+function spawnSparkles(x, y, symbols = ['🌸', '✨']){
+  for(let i = 0; i < 5; i++){
+    const s = document.createElement('span');
+    s.className = 'click-sparkle';
+    s.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    const angle = (Math.PI * 2 * i) / 5 + (Math.random() * 0.5);
+    const dist = 24 + Math.random() * 28;
+    s.style.left = x + 'px';
+    s.style.top = y + 'px';
+    s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    s.style.setProperty('--dy', Math.sin(angle) * dist - 10 + 'px');
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 750);
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if(e.target.closest('button, input, .mascot-wrap')) return;
+  spawnSparkles(e.clientX, e.clientY, ['🌸', '✨']);
+});
+
+/* =========================================================
    KONEKSI FIREBASE (REST API + Database Secret / legacy token)
-   Dipakai polling sederhana (bukan listener realtime SDK),
-   supaya website tetap murni HTML+JS tanpa build tool,
-   cocok untuk di-hosting di GitHub Pages.
    ========================================================= */
 const FIREBASE_HOST = "https://project-incubator-e66a2-default-rtdb.firebaseio.com";
 const FIREBASE_AUTH = "oLOMh7rY9SjMC03w7gmjrcBf7dHxUPs5faTkVd40";
@@ -347,6 +780,18 @@ function setConn(ok){
   document.getElementById('connText').textContent = ok ? "Terhubung ke Firebase" : "Koneksi terputus, mencoba ulang...";
 }
 
+function updateFanVisual(speed){
+  const val = Number(speed) || 0;
+  const slider = document.getElementById('speedSlider');
+  slider.value = val;
+  slider.style.setProperty('--fill', val + '%');
+  document.getElementById('speedValue').textContent = val;
+
+  const dur = val > 0 ? Math.max(0.28, 4 - val / 28) : 0;
+  document.getElementById('fanSvg').style.animationDuration = dur + "s";
+  document.getElementById('fanVisual').classList.toggle('active', val > 0);
+}
+
 async function refreshData(){
   try{
     const [suhuDht, kelembapan, suhuMax, statusHeater, alarm, speedKipas, setpointSuhu] = await Promise.all([
@@ -354,22 +799,26 @@ async function refreshData(){
       fbGet("status_heater"), fbGet("alarm"), fbGet("speed_kipas"), fbGet("setpoint_suhu")
     ]);
 
-    document.getElementById('suhuDht').textContent = (suhuDht ?? 0).toFixed ? suhuDht.toFixed(1) : suhuDht;
-    document.getElementById('kelembapan').textContent = (kelembapan ?? 0).toFixed ? kelembapan.toFixed(0) : kelembapan;
-    document.getElementById('suhuMax').textContent = (suhuMax ?? 0).toFixed ? suhuMax.toFixed(1) : suhuMax;
+    const fmtSuhuDht = (suhuDht ?? 0).toFixed ? suhuDht.toFixed(1) : suhuDht;
+    const fmtKelembapan = (kelembapan ?? 0).toFixed ? kelembapan.toFixed(0) : kelembapan;
+    const fmtSuhuMax = (suhuMax ?? 0).toFixed ? suhuMax.toFixed(1) : suhuMax;
+
+    flashValue('valSuhuDht', fmtSuhuDht);
+    flashValue('valKelembapan', fmtKelembapan);
+    flashValue('valSuhuMax', fmtSuhuMax);
 
     const badgeHeater = document.getElementById('badgeHeater');
     badgeHeater.textContent = statusHeater ? "ON" : "OFF";
     badgeHeater.className = "badge " + (statusHeater ? "on" : "off");
+    document.getElementById('statHeater').classList.toggle('heater-active', Boolean(statusHeater));
 
     const badgeAlarm = document.getElementById('badgeAlarm');
     badgeAlarm.textContent = alarm ? "OVERHEAT! 🔥" : "AMAN 🌸";
     badgeAlarm.className = "badge " + (alarm ? "alarm" : "safe");
+    document.getElementById('alarmCard').classList.toggle('alarm-active', Boolean(alarm));
 
     if(!isUserDraggingSlider && typeof speedKipas === "number"){
-      document.getElementById('speedSlider').value = speedKipas;
-      document.getElementById('speedValue').textContent = speedKipas;
-      document.getElementById('fanSvg').style.animationDuration = speedKipas > 0 ? Math.max(0.3, 4 - speedKipas/28) + "s" : "0s";
+      updateFanVisual(speedKipas);
     }
     if(typeof setpointSuhu === "number" && document.activeElement.id !== "setpointInput"){
       document.getElementById('setpointInput').value = setpointSuhu;
@@ -386,15 +835,28 @@ async function refreshData(){
 const slider = document.getElementById('speedSlider');
 slider.addEventListener('input', () => {
   isUserDraggingSlider = true;
-  document.getElementById('speedValue').textContent = slider.value;
-  const dur = slider.value > 0 ? Math.max(0.3, 4 - slider.value/28) : 0;
-  document.getElementById('fanSvg').style.animationDuration = dur + "s";
+  updateFanVisual(slider.value);
 });
 slider.addEventListener('change', async () => {
   try{
     await fbSet("speed_kipas", Number(slider.value));
+    showToast(`🌀 Kipas diatur ke ${slider.value}%`);
   }catch(e){ console.error(e); }
   setTimeout(() => isUserDraggingSlider = false, 1500);
+});
+
+// ---- tombol preset kecepatan kipas ----
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const targetSpeed = Number(btn.dataset.speed);
+    isUserDraggingSlider = true;
+    updateFanVisual(targetSpeed);
+    try{
+      await fbSet("speed_kipas", targetSpeed);
+      showToast(`🌀 Kipas diatur ke ${targetSpeed}%`);
+    }catch(e){ console.error(e); }
+    setTimeout(() => isUserDraggingSlider = false, 1500);
+  });
 });
 
 // ---- setpoint suhu ----
@@ -406,6 +868,7 @@ document.getElementById('btnSetpoint').addEventListener('click', async () => {
     const btn = document.getElementById('btnSetpoint');
     const old = btn.textContent;
     btn.textContent = "Tersimpan ✓";
+    showToast(`🎯 Setpoint ${val.toFixed(1)}°C tersimpan!`);
     setTimeout(() => btn.textContent = old, 1200);
   }catch(e){ console.error(e); }
 });
@@ -421,33 +884,36 @@ setInterval(refreshData, 2500);
   const container = document.getElementById('bgDecor');
 
   // kelopak sakura
-  for(let i=0;i<22;i++){
+  for(let i = 0; i < 24; i++){
     const p = document.createElement('div');
     p.className = 'petal';
-    p.style.left = Math.random()*100 + "%";
-    p.style.animationDuration = (6 + Math.random()*8) + "s";
-    p.style.animationDelay = (Math.random()*10) + "s";
-    p.style.opacity = 0.3 + Math.random()*0.4;
-    const size = 10 + Math.random()*12;
-    p.style.width = size+"px"; p.style.height = size+"px";
+    p.style.left = Math.random() * 100 + "%";
+    p.style.animationDuration = (7 + Math.random() * 8) + "s";
+    p.style.animationDelay = (-Math.random() * 12) + "s";
+    p.style.opacity = 0.35 + Math.random() * 0.4;
+    const size = 10 + Math.random() * 11;
+    p.style.width = size + "px";
+    p.style.height = size + "px";
     container.appendChild(p);
   }
 
   // telur-telur lucu tersebar di background
   const eggPositions = [
-    {top:"8%",left:"4%",size:70,rot:-10},
-    {top:"22%",left:"88%",size:55,rot:12},
-    {top:"48%",left:"2%",size:50,rot:8},
-    {top:"65%",left:"90%",size:65,rot:-8},
-    {top:"85%",left:"8%",size:60,rot:14},
-    {top:"92%",left:"78%",size:50,rot:-14},
+    {top:"8%", left:"4%", size:68, rot:-10, delay:"0s"},
+    {top:"22%", left:"88%", size:54, rot:12, delay:"1.2s"},
+    {top:"48%", left:"2%", size:50, rot:8, delay:"2.4s"},
+    {top:"65%", left:"90%", size:64, rot:-8, delay:"0.8s"},
+    {top:"84%", left:"7%", size:58, rot:14, delay:"1.8s"},
+    {top:"91%", left:"78%", size:50, rot:-14, delay:"3s"},
   ];
-  eggPositions.forEach(pos=>{
+  eggPositions.forEach(pos => {
     const div = document.createElement('div');
     div.className = 'egg-bg';
-    div.style.top = pos.top; div.style.left = pos.left;
-    div.style.width = pos.size+"px";
-    div.style.transform = `rotate(${pos.rot}deg)`;
+    div.style.top = pos.top;
+    div.style.left = pos.left;
+    div.style.width = pos.size + "px";
+    div.style.setProperty('--rot', pos.rot + "deg");
+    div.style.animationDelay = pos.delay;
     div.innerHTML = `
       <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="50" cy="70" rx="42" ry="55" fill="#ff7fac"/>
