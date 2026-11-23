@@ -3,19 +3,19 @@
   SISTEM KENDALI SUHU INKUBATOR TELUR - ESP32 (sesuai wiring REV. 5)
   =====================================================================
   Komponen:
-    - DHT22            -> GPIO 4           (loop kendali utama)
-    - MAX6675 (K-Type)  -> SCK 18, CS 5, SO 19   (failsafe over-temperature)
-    - LCD I2C 16x2      -> SDA 21, SCL 22
-    - Relay Heater      -> GPIO 26
-    - Buzzer/LED        -> GPIO 27
-    - L298N (fan)       -> ENA 32 (PWM), IN1 33, IN2 14
+- DHT22            -> GPIO 4           (loop kendali utama)
+- MAX6675 (K-Type)  -> SCK 18, CS 5, SO 19   (failsafe over-temperature)
+- LCD I2C 16x2      -> SDA 21, SCL 22
+- Relay Heater      -> GPIO 26
+- Buzzer/LED        -> GPIO 27
+- L298N (fan)       -> ENA 32 (PWM), IN1 33, IN2 14
 
   Library yang perlu diinstal lewat Library Manager:
-    - DHT sensor library (Adafruit)
-    - Adafruit Unified Sensor
-    - MAX6675 library (by Adafruit)
-    - LiquidCrystal I2C (by Frank de Brabander / Marco Schwartz)
-    - Firebase ESP32 Client (by Mobizt)  -> search "Firebase ESP32" di Library Manager
+- DHT sensor library (Adafruit)
+- Adafruit Unified Sensor
+- MAX6675 library (by Adafruit)
+- LiquidCrystal I2C (by Frank de Brabander / Marco Schwartz)
+- Firebase ESP32 Client (by Mobizt)  -> search "Firebase ESP32" di Library Manager
 
   Firebase: pakai Database Secret (legacy token) sesuai yang Anda berikan.
   =====================================================================
@@ -67,6 +67,8 @@ const int SPEED_MIN_PERCENT = 30;   // kipas tidak pernah benar-benar berhenti
 bool statusHeater = false;
 bool statusAlarm  = false;
 float gSuhuDHT = 0, gHumDHT = 0, gSuhuMax = 0;   // nilai sensor terakhir, dikirim ke Firebase
+
+int heartbeatCounter = 0;   // penanda ESP32 aktif untuk deteksi online/offline di web
 
 unsigned long lastSensorRead   = 0;
 unsigned long lastFirebaseSync = 0;
@@ -121,6 +123,12 @@ void setup() {
 
   Firebase.begin(&firebaseConfig, &firebaseAuth);
   Firebase.reconnectWiFi(true);
+
+  // Kirim sinyal awal agar web langsung mendeteksi ESP32 terhubung
+  if (Firebase.ready()) {
+    heartbeatCounter = 1;
+    Firebase.setInt(firebaseData, "/inkubator/heartbeat", heartbeatCounter);
+  }
 
   lcd.clear();
 }
@@ -187,12 +195,12 @@ void loop() {
 
   // =========================================================
   // 2) SINKRON FIREBASE (baca setpoint & kecepatan kipas dari web,
-  //    kirim status/sensor terakhir ke web)
+  //    kirim status/sensor & heartbeat terakhir ke web)
   // =========================================================
   if (now - lastFirebaseSync >= INTERVAL_FIREBASE) {
     lastFirebaseSync = now;
 
-    if (Firebase.ready()) {
+    if (WiFi.status() == WL_CONNECTED && Firebase.ready()) {
       // ---- baca dari web ----
       if (Firebase.getFloat(firebaseData, "/inkubator/setpoint_suhu")) {
         setpointSuhu = firebaseData.floatData();
@@ -201,14 +209,24 @@ void loop() {
         speedKipasWeb = firebaseData.intData();
       }
 
-      // ---- kirim ke web ----
-      Firebase.setFloat(firebaseData, "/inkubator/suhu_dht", gSuhuDHT);
-      Firebase.setFloat(firebaseData, "/inkubator/kelembapan", gHumDHT);
-      Firebase.setFloat(firebaseData, "/inkubator/suhu_thermocouple", gSuhuMax);
+      // ---- kirim sensor ke web (cegah kirim NaN jika sensor sempat error) ----
+      if (!isnan(gSuhuDHT)) {
+        Firebase.setFloat(firebaseData, "/inkubator/suhu_dht", gSuhuDHT);
+      }
+      if (!isnan(gHumDHT)) {
+        Firebase.setFloat(firebaseData, "/inkubator/kelembapan", gHumDHT);
+      }
+      if (!isnan(gSuhuMax)) {
+        Firebase.setFloat(firebaseData, "/inkubator/suhu_thermocouple", gSuhuMax);
+      }
       Firebase.setBool(firebaseData, "/inkubator/status_heater", statusHeater);
       Firebase.setBool(firebaseData, "/inkubator/alarm", statusAlarm);
+
+      // ---- kirim heartbeat agar website tahu ESP32 aktif ----
+      heartbeatCounter = (heartbeatCounter + 1) % 1000000;
+      Firebase.setInt(firebaseData, "/inkubator/heartbeat", heartbeatCounter);
     } else {
-      Serial.println("Firebase belum siap (cek WiFi/token).");
+      Serial.println("Firebase/WiFi belum siap (cek koneksi/token).");
     }
   }
 }
