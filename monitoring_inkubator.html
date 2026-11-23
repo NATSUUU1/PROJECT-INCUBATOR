@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>🌸 Inkubator Telur Monitor 🥚</title>
+<style>
+  :root{
+    --pink-light:#ffe3ef;
+    --pink-mid:#ffb6d0;
+    --pink-deep:#ff7fac;
+    --pink-dark:#e84a8a;
+    --cream:#fff6f2;
+    --text:#5a3346;
+    --green-ok:#6fcf97;
+    --red-alarm:#ff5c6c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --pink-light:#3a2230;
+      --pink-mid:#5c2f45;
+      --pink-deep:#ff7fac;
+      --pink-dark:#ff9cc3;
+      --cream:#2a1b22;
+      --text:#ffe3ef;
+    }
+  }
+  :root[data-theme="dark"]{
+    --pink-light:#3a2230;
+    --pink-mid:#5c2f45;
+    --pink-deep:#ff7fac;
+    --pink-dark:#ff9cc3;
+    --cream:#2a1b22;
+    --text:#ffe3ef;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    height:100%;
+    font-family:'Segoe UI', 'Trebuchet MS', sans-serif;
+    background:linear-gradient(160deg,var(--pink-light),var(--cream));
+    color:var(--text);
+    overflow-x:hidden;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+
+  /* ---------- Background decor: sakura petals + cute eggs ---------- */
+  .bg-decor{
+    position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  }
+  .petal{
+    position:absolute; top:-10%;
+    width:18px; height:18px;
+    background:var(--pink-deep);
+    border-radius:0 100% 0 100%;
+    opacity:.55;
+    animation:fall linear infinite;
+  }
+  @keyframes fall{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); }
+    100%{ transform:translateY(110vh) translateX(40px) rotate(260deg); }
+  }
+  .egg-bg{
+    position:absolute;
+    opacity:.16;
+    filter:blur(0.2px);
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap{
+    position:relative; z-index:1;
+    max-width:780px;
+    margin:0 auto;
+    padding:28px 18px 60px;
+  }
+  header{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  header h1{
+    margin:0;
+    font-size:1.7rem;
+    color:var(--pink-dark);
+    text-shadow:0 1px 0 rgba(255,255,255,.5);
+  }
+  header p{
+    margin:6px 0 0;
+    font-size:.92rem;
+    opacity:.8;
+  }
+  .egg-mascot{
+    width:56px;
+    display:block;
+    margin:0 auto 6px;
+  }
+
+  .card{
+    background:rgba(255,255,255,0.55);
+    border:2px solid var(--pink-mid);
+    border-radius:22px;
+    padding:18px 20px;
+    margin-bottom:18px;
+    box-shadow:0 6px 18px rgba(232,74,138,.12);
+    backdrop-filter:blur(6px);
+  }
+  :root[data-theme="dark"] .card, @media (prefers-color-scheme: dark){ .card{ background:rgba(0,0,0,0.18); } }
+
+  .card h2{
+    margin:0 0 12px;
+    font-size:1.05rem;
+    color:var(--pink-dark);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  /* ---------- Fan control (main feature) ---------- */
+  .fan-card{
+    text-align:center;
+    border-width:3px;
+  }
+  .fan-visual{
+    width:120px; height:120px;
+    margin:4px auto 14px;
+    position:relative;
+  }
+  .fan-visual svg{ width:100%; height:100%; transform-origin:50% 50%; }
+  .fan-spin{ animation:spin linear infinite; animation-duration:4s; }
+
+  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+  .speed-readout{
+    font-size:2.2rem;
+    font-weight:700;
+    color:var(--pink-dark);
+    margin:4px 0 14px;
+  }
+  input[type=range]{
+    width:100%;
+    accent-color:var(--pink-deep);
+    height:8px;
+    cursor:pointer;
+  }
+  .slider-labels{
+    display:flex; justify-content:space-between;
+    font-size:.78rem; opacity:.7; margin-top:4px;
+  }
+  .hint{
+    font-size:.78rem; opacity:.65; margin-top:10px;
+  }
+
+  /* ---------- Monitoring grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  @media(max-width:480px){ .grid{ grid-template-columns:1fr 1fr; gap:10px; } }
+
+  .stat{
+    background:var(--cream);
+    border-radius:16px;
+    padding:14px;
+    text-align:center;
+    border:1px solid var(--pink-mid);
+  }
+  .stat .label{ font-size:.75rem; opacity:.75; }
+  .stat .value{ font-size:1.5rem; font-weight:700; color:var(--pink-dark); margin-top:2px; }
+  .stat .unit{ font-size:.8rem; font-weight:400; opacity:.7; }
+
+  .badge{
+    display:inline-block;
+    padding:4px 14px;
+    border-radius:999px;
+    font-size:.85rem;
+    font-weight:600;
+  }
+  .badge.on{ background:var(--green-ok); color:#fff; }
+  .badge.off{ background:#ccc; color:#555; }
+  .badge.alarm{ background:var(--red-alarm); color:#fff; animation:pulse 1s infinite; }
+  .badge.safe{ background:var(--green-ok); color:#fff; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
+
+  /* ---------- Setpoint ---------- */
+  .setpoint-row{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .setpoint-row input[type=number]{
+    width:90px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:2px solid var(--pink-mid);
+    font-size:1rem;
+    text-align:center;
+    background:var(--cream);
+    color:var(--text);
+  }
+  button{
+    background:var(--pink-deep);
+    color:#fff;
+    border:none;
+    padding:9px 18px;
+    border-radius:14px;
+    font-size:.9rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:transform .15s;
+  }
+  button:hover{ transform:translateY(-1px); }
+  button:active{ transform:scale(.96); }
+
+  .status-footer{
+    text-align:center;
+    font-size:.75rem;
+    opacity:.6;
+    margin-top:10px;
+  }
+  .dot{
+    display:inline-block; width:8px; height:8px; border-radius:50%;
+    background:var(--green-ok); margin-right:5px;
+  }
+  .dot.off{ background:#bbb; }
+</style>
+</head>
+<body>
+
+<div class="bg-decor" id="bgDecor"></div>
+
+<div class="wrap">
+
+  <header>
+    <svg class="egg-mascot" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="70" rx="42" ry="55" fill="#fff6f2" stroke="#ff7fac" stroke-width="4"/>
+      <circle cx="37" cy="62" r="4" fill="#5a3346"/>
+      <circle cx="63" cy="62" r="4" fill="#5a3346"/>
+      <path d="M38 80 Q50 90 62 80" stroke="#e84a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="26" cy="74" r="6" fill="#ffb6d0" opacity=".7"/>
+      <circle cx="74" cy="74" r="6" fill="#ffb6d0" opacity=".7"/>
+    </svg>
+    <h1>Inkubator Telur Monitor 🌸</h1>
+    <p>Kendali kecepatan kipas & pantau suhu inkubator secara real-time</p>
+  </header>
+
+  <!-- ===================== FAN CONTROL (FITUR UTAMA) ===================== -->
+  <div class="card fan-card">
+    <h2>🌀 Kontrol Kecepatan Kipas Sirkulasi</h2>
+
+    <div class="fan-visual">
+      <svg id="fanSvg" class="fan-spin" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="#ffe3ef" stroke="#ff7fac" stroke-width="3"/>
+        <g fill="#ff7fac">
+          <path d="M50 50 Q30 10 50 8 Q65 10 50 50 Z"/>
+          <path d="M50 50 Q90 30 92 50 Q90 65 50 50 Z"/>
+          <path d="M50 50 Q70 90 50 92 Q35 90 50 50 Z"/>
+          <path d="M50 50 Q10 70 8 50 Q10 35 50 50 Z"/>
+        </g>
+        <circle cx="50" cy="50" r="9" fill="#e84a8a"/>
+      </svg>
+    </div>
+
+    <div class="speed-readout"><span id="speedValue">0</span>%</div>
+
+    <input type="range" id="speedSlider" min="0" max="100" value="0" step="5">
+    <div class="slider-labels"><span>0% (mati)</span><span>100% (maksimum)</span></div>
+    <div class="hint">🥚 Minimal kipas tetap berputar 30% di firmware ESP32 agar panas selalu merata, walau slider ini diset lebih rendah.</div>
+  </div>
+
+  <!-- ===================== SETPOINT SUHU ===================== -->
+  <div class="card">
+    <h2>🎯 Setpoint Suhu Heater</h2>
+    <div class="setpoint-row">
+      <input type="number" id="setpointInput" step="0.1" value="37.5"> °C
+      <button id="btnSetpoint">Simpan Setpoint</button>
+    </div>
+    <div class="hint">Heater akan menyala otomatis jika suhu ruang (DHT22) di bawah nilai ini.</div>
+  </div>
+
+  <!-- ===================== MONITORING ===================== -->
+  <div class="card">
+    <h2>📊 Pemantauan Real-time</h2>
+    <div class="grid">
+      <div class="stat">
+        <div class="label">Suhu Ruang (DHT22)</div>
+        <div class="value"><span id="suhuDht">--</span><span class="unit"> °C</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">Kelembapan</div>
+        <div class="value"><span id="kelembapan">--</span><span class="unit"> %</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">Suhu Thermocouple</div>
+        <div class="value"><span id="suhuMax">--</span><span class="unit"> °C</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">Status Heater</div>
+        <div class="value"><span id="badgeHeater" class="badge off">OFF</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ALARM ===================== -->
+  <div class="card">
+    <h2>🚨 Status Keamanan</h2>
+    <div style="text-align:center;">
+      <span id="badgeAlarm" class="badge safe">AMAN</span>
+    </div>
+    <div class="hint" style="text-align:center;">Failsafe thermocouple berjalan lokal di ESP32 — tetap aktif walau koneksi ke halaman ini terputus.</div>
+  </div>
+
+  <div class="status-footer">
+    <span class="dot" id="connDot"></span><span id="connText">Menghubungkan ke Firebase...</span>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   KONEKSI FIREBASE (REST API + Database Secret / legacy token)
+   Dipakai polling sederhana (bukan listener realtime SDK),
+   supaya website tetap murni HTML+JS tanpa build tool,
+   cocok untuk di-hosting di GitHub Pages.
+   ========================================================= */
+const FIREBASE_HOST = "https://project-incubator-e66a2-default-rtdb.firebaseio.com";
+const FIREBASE_AUTH = "oLOMh7rY9SjMC03w7gmjrcBf7dHxUPs5faTkVd40";
+const PATH = "/inkubator";
+
+let isUserDraggingSlider = false;
+
+async function fbGet(key){
+  const res = await fetch(`${FIREBASE_HOST}${PATH}/${key}.json?auth=${FIREBASE_AUTH}`);
+  if(!res.ok) throw new Error("Gagal membaca " + key);
+  return res.json();
+}
+async function fbSet(key, value){
+  const res = await fetch(`${FIREBASE_HOST}${PATH}/${key}.json?auth=${FIREBASE_AUTH}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(value)
+  });
+  if(!res.ok) throw new Error("Gagal menyimpan " + key);
+  return res.json();
+}
+
+function setConn(ok){
+  document.getElementById('connDot').classList.toggle('off', !ok);
+  document.getElementById('connText').textContent = ok ? "Terhubung ke Firebase" : "Koneksi terputus, mencoba ulang...";
+}
+
+async function refreshData(){
+  try{
+    const [suhuDht, kelembapan, suhuMax, statusHeater, alarm, speedKipas, setpointSuhu] = await Promise.all([
+      fbGet("suhu_dht"), fbGet("kelembapan"), fbGet("suhu_thermocouple"),
+      fbGet("status_heater"), fbGet("alarm"), fbGet("speed_kipas"), fbGet("setpoint_suhu")
+    ]);
+
+    document.getElementById('suhuDht').textContent = (suhuDht ?? 0).toFixed ? suhuDht.toFixed(1) : suhuDht;
+    document.getElementById('kelembapan').textContent = (kelembapan ?? 0).toFixed ? kelembapan.toFixed(0) : kelembapan;
+    document.getElementById('suhuMax').textContent = (suhuMax ?? 0).toFixed ? suhuMax.toFixed(1) : suhuMax;
+
+    const badgeHeater = document.getElementById('badgeHeater');
+    badgeHeater.textContent = statusHeater ? "ON" : "OFF";
+    badgeHeater.className = "badge " + (statusHeater ? "on" : "off");
+
+    const badgeAlarm = document.getElementById('badgeAlarm');
+    badgeAlarm.textContent = alarm ? "OVERHEAT! 🔥" : "AMAN 🌸";
+    badgeAlarm.className = "badge " + (alarm ? "alarm" : "safe");
+
+    if(!isUserDraggingSlider && typeof speedKipas === "number"){
+      document.getElementById('speedSlider').value = speedKipas;
+      document.getElementById('speedValue').textContent = speedKipas;
+      document.getElementById('fanSvg').style.animationDuration = speedKipas > 0 ? Math.max(0.3, 4 - speedKipas/28) + "s" : "0s";
+    }
+    if(typeof setpointSuhu === "number" && document.activeElement.id !== "setpointInput"){
+      document.getElementById('setpointInput').value = setpointSuhu;
+    }
+
+    setConn(true);
+  }catch(e){
+    console.error(e);
+    setConn(false);
+  }
+}
+
+// ---- slider kipas ----
+const slider = document.getElementById('speedSlider');
+slider.addEventListener('input', () => {
+  isUserDraggingSlider = true;
+  document.getElementById('speedValue').textContent = slider.value;
+  const dur = slider.value > 0 ? Math.max(0.3, 4 - slider.value/28) : 0;
+  document.getElementById('fanSvg').style.animationDuration = dur + "s";
+});
+slider.addEventListener('change', async () => {
+  try{
+    await fbSet("speed_kipas", Number(slider.value));
+  }catch(e){ console.error(e); }
+  setTimeout(() => isUserDraggingSlider = false, 1500);
+});
+
+// ---- setpoint suhu ----
+document.getElementById('btnSetpoint').addEventListener('click', async () => {
+  const val = parseFloat(document.getElementById('setpointInput').value);
+  if(isNaN(val)) return;
+  try{
+    await fbSet("setpoint_suhu", val);
+    const btn = document.getElementById('btnSetpoint');
+    const old = btn.textContent;
+    btn.textContent = "Tersimpan ✓";
+    setTimeout(() => btn.textContent = old, 1200);
+  }catch(e){ console.error(e); }
+});
+
+// ---- polling tiap 2.5 detik ----
+refreshData();
+setInterval(refreshData, 2500);
+
+/* =========================================================
+   DEKORASI: kelopak sakura jatuh + telur-telur lucu di background
+   ========================================================= */
+(function decor(){
+  const container = document.getElementById('bgDecor');
+
+  // kelopak sakura
+  for(let i=0;i<22;i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random()*100 + "%";
+    p.style.animationDuration = (6 + Math.random()*8) + "s";
+    p.style.animationDelay = (Math.random()*10) + "s";
+    p.style.opacity = 0.3 + Math.random()*0.4;
+    const size = 10 + Math.random()*12;
+    p.style.width = size+"px"; p.style.height = size+"px";
+    container.appendChild(p);
+  }
+
+  // telur-telur lucu tersebar di background
+  const eggPositions = [
+    {top:"8%",left:"4%",size:70,rot:-10},
+    {top:"22%",left:"88%",size:55,rot:12},
+    {top:"48%",left:"2%",size:50,rot:8},
+    {top:"65%",left:"90%",size:65,rot:-8},
+    {top:"85%",left:"8%",size:60,rot:14},
+    {top:"92%",left:"78%",size:50,rot:-14},
+  ];
+  eggPositions.forEach(pos=>{
+    const div = document.createElement('div');
+    div.className = 'egg-bg';
+    div.style.top = pos.top; div.style.left = pos.left;
+    div.style.width = pos.size+"px";
+    div.style.transform = `rotate(${pos.rot}deg)`;
+    div.innerHTML = `
+      <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="70" rx="42" ry="55" fill="#ff7fac"/>
+        <circle cx="37" cy="62" r="4" fill="#5a3346"/>
+        <circle cx="63" cy="62" r="4" fill="#5a3346"/>
+        <path d="M38 80 Q50 88 62 80" stroke="#5a3346" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>`;
+    container.appendChild(div);
+  });
+})();
+</script>
+
+</body>
+</html>
