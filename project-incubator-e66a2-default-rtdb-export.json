@@ -1,0 +1,7 @@
+{
+  "inkubator": {
+    "alarm": false,
+    "status_heater": false,
+    "suhu_thermocouple": 0
+  }
+}
