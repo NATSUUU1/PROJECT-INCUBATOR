@@ -211,4 +211,983 @@
 
   /* ---------- Cards ---------- */
   .card{
-    background:
+    background:var(--card-bg);
+    border:1.5px solid var(--card-border);
+    border-radius:24px;
+    padding:20px 22px;
+    margin-bottom:18px;
+    box-shadow:
+      0 10px 28px var(--shadow-color),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.3s ease;
+    animation:cardFadeUp 0.6s cubic-bezier(.16,1,.3,1) both;
+  }
+  .card:nth-of-type(1){ animation-delay:0.06s; }
+  .card:nth-of-type(2){ animation-delay:0.14s; }
+  .card:nth-of-type(3){ animation-delay:0.22s; }
+  .card:nth-of-type(4){ animation-delay:0.30s; }
+
+  @keyframes cardFadeUp{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .card:hover{
+    transform:translateY(-3px);
+    box-shadow:
+      0 14px 32px var(--shadow-color),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  .card h2{
+    margin:0 0 14px;
+    font-size:1.06rem;
+    font-weight:700;
+    color:var(--pink-dark);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  /* ---------- Fan Control ---------- */
+  .fan-card{
+    text-align:center;
+    border-width:2px;
+    position:relative;
+    overflow:hidden;
+  }
+  .fan-card::before{
+    content:"";
+    position:absolute;
+    top:-60px; left:50%; transform:translateX(-50%);
+    width:220px; height:220px;
+    background:radial-gradient(circle, rgba(255, 127, 172, 0.22), transparent 70%);
+    pointer-events:none;
+  }
+
+  .fan-visual{
+    width:130px; height:130px;
+    margin:6px auto 14px;
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fan-ring{
+    position:absolute;
+    inset:4px;
+    border-radius:50%;
+    border:2px dashed var(--pink-deep);
+    opacity:0;
+    pointer-events:none;
+  }
+  .fan-visual.active .fan-ring{
+    animation:windRipple 1.8s ease-out infinite;
+  }
+  @keyframes windRipple{
+    0%{ transform:scale(0.85); opacity:0.65; }
+    100%{ transform:scale(1.28); opacity:0; }
+  }
+
+  .fan-visual svg{
+    width:112px; height:112px;
+    transform-origin:50% 50%;
+    filter:drop-shadow(0 4px 10px rgba(232, 74, 138, 0.2));
+  }
+  .fan-spin{
+    animation:spin linear infinite;
+    animation-duration:0s;
+  }
+  @keyframes spin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
+  }
+
+  .speed-readout{
+    font-size:2.35rem;
+    font-weight:700;
+    color:var(--pink-dark);
+    margin:2px 0 12px;
+    line-height:1.1;
+    text-shadow:0 2px 12px rgba(255, 127, 172, 0.28);
+  }
+
+  /* Custom Range Slider */
+  input[type=range]{
+    -webkit-appearance:none;
+    appearance:none;
+    width:100%;
+    height:10px;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--pink-deep) var(--fill, 0%), rgba(255, 182, 208, 0.45) var(--fill, 0%));
+    outline:none;
+    cursor:pointer;
+    transition:box-shadow 0.2s;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:24px; height:24px;
+    border-radius:50%;
+    background:#fff;
+    border:4px solid var(--pink-dark);
+    box-shadow:0 3px 10px rgba(232, 74, 138, 0.35);
+    cursor:pointer;
+    transition:transform 0.15s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{
+    transform:scale(1.15);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px; height:22px;
+    border-radius:50%;
+    background:#fff;
+    border:4px solid var(--pink-dark);
+    box-shadow:0 3px 10px rgba(232, 74, 138, 0.35);
+    cursor:pointer;
+  }
+
+  .slider-labels{
+    display:flex; justify-content:space-between;
+    font-size:.78rem; font-weight:600; color:var(--text-muted); margin-top:6px;
+  }
+
+  .preset-row{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+  }
+  .preset-btn{
+    background:var(--stat-bg);
+    color:var(--pink-dark);
+    border:1.5px solid var(--pink-mid);
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:700;
+    box-shadow:none;
+  }
+  .preset-btn:hover{
+    background:var(--pink-deep);
+    color:#fff;
+    border-color:var(--pink-deep);
+  }
+
+  .hint{
+    font-size:.8rem;
+    line-height:1.45;
+    color:var(--text-muted);
+    margin-top:12px;
+  }
+
+  /* ---------- Monitoring Grid & Animated Moving Borders ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:14px;
+  }
+  @media(max-width:480px){
+    .grid{ gap:10px; }
+  }
+
+  .stat{
+    position:relative;
+    border-radius:20px;
+    padding:2.5px; /* Ketebalan border animasi bergerak */
+    overflow:hidden;
+    background:var(--card-border);
+    box-shadow:0 6px 18px rgba(232, 74, 138, 0.12);
+    transition:transform 0.25s ease, box-shadow 0.3s ease;
+  }
+  .stat:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 24px rgba(232, 74, 138, 0.22);
+  }
+
+  /* Cahaya gradasi berputar di sekeliling kotak nilai */
+  .stat::before{
+    content:"";
+    position:absolute;
+    top:50%; left:50%;
+    width:220%; height:220%;
+    background:conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(255, 182, 208, 0.35) 55deg,
+      var(--pink-deep) 110deg,
+      #ffffff 140deg,
+      var(--pink-dark) 175deg,
+      transparent 230deg,
+      transparent 360deg
+    );
+    transform:translate(-50%, -50%) rotate(0deg);
+    animation:borderTravel 3.6s linear infinite;
+    z-index:0;
+  }
+
+  /* Stagger animasi border tiap kotak agar terlihat mengalir harmonis */
+  .stat:nth-child(1)::before{ animation-delay:0s; }
+  .stat:nth-child(2)::before{ animation-delay:-0.9s; }
+  .stat:nth-child(3)::before{ animation-delay:-1.8s; }
+  .stat:nth-child(4)::before{ animation-delay:-2.7s; }
+
+  /* Warna border hangat & lebih cepat saat Heater menyala */
+  .stat.heater-active{
+    box-shadow:0 6px 22px rgba(255, 159, 67, 0.28);
+  }
+  .stat.heater-active::before{
+    background:conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      #ffd166 70deg,
+      #ff9f43 130deg,
+      #ffffff 155deg,
+      #ff6b6b 195deg,
+      transparent 250deg,
+      transparent 360deg
+    );
+    animation-duration:2.2s;
+  }
+
+  @keyframes borderTravel{
+    0%{ transform:translate(-50%, -50%) rotate(0deg); }
+    100%{ transform:translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .stat-inner{
+    position:relative;
+    z-index:1;
+    background:var(--stat-bg);
+    border-radius:17.5px;
+    padding:15px 12px;
+    text-align:center;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+  }
+
+  .stat .label{
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--text-muted);
+  }
+
+  /* Animasi tampilan nilai sensor */
+  .stat .value{
+    position:relative;
+    font-size:1.65rem;
+    font-weight:700;
+    margin-top:5px;
+    display:inline-flex;
+    align-items:baseline;
+    justify-content:center;
+    background:linear-gradient(120deg, var(--pink-dark) 20%, var(--pink-deep) 50%, var(--pink-dark) 80%);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:valueShimmer 4s linear infinite;
+    transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes valueShimmer{
+    0%{ background-position:200% center; }
+    100%{ background-position:0% center; }
+  }
+
+  .stat .value.updated{
+    animation:valueShimmer 4s linear infinite, valueBounceGlow 0.55s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes valueBounceGlow{
+    0%{ transform:scale(1); filter:drop-shadow(0 0 0 rgba(255, 127, 172, 0)); }
+    40%{ transform:scale(1.16); filter:drop-shadow(0 0 10px rgba(255, 127, 172, 0.65)); }
+    100%{ transform:scale(1); filter:drop-shadow(0 0 0 rgba(255, 127, 172, 0)); }
+  }
+
+  .stat .unit{
+    font-size:.86rem;
+    font-weight:700;
+    margin-left:3px;
+    color:var(--text-muted);
+    -webkit-text-fill-color:var(--text-muted);
+  }
+
+  .badge{
+    display:inline-block;
+    padding:5px 16px;
+    border-radius:999px;
+    font-size:.86rem;
+    font-weight:700;
+    letter-spacing:0.3px;
+    -webkit-text-fill-color:initial;
+    transition:all 0.3s ease;
+  }
+  .badge.on{
+    background:linear-gradient(135deg, #6fcf97, #48b878);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(82, 196, 132, 0.35);
+    animation:badgeBreathe 2s ease-in-out infinite;
+  }
+  .badge.off{
+    background:rgba(160, 145, 153, 0.25);
+    color:var(--text-muted);
+  }
+  .badge.alarm{
+    background:linear-gradient(135deg, #ff6b7a, #e83e52);
+    color:#fff;
+    box-shadow:0 4px 16px rgba(255, 92, 108, 0.45);
+    animation:pulse 1s infinite;
+  }
+  .badge.safe{
+    background:linear-gradient(135deg, #6fcf97, #48b878);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(82, 196, 132, 0.3);
+  }
+  @keyframes badgeBreathe{
+    0%, 100%{ transform:scale(1); }
+    50%{ transform:scale(1.05); }
+  }
+  @keyframes pulse{
+    0%, 100%{ transform:scale(1); opacity:1; }
+    50%{ transform:scale(1.06); opacity:.78; }
+  }
+
+  .card.alarm-active{
+    border-color:var(--red-alarm);
+    box-shadow:0 0 24px rgba(255, 92, 108, 0.32);
+  }
+
+  /* ---------- Setpoint & Buttons ---------- */
+  .setpoint-row{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .setpoint-row input[type=number]{
+    width:96px;
+    padding:9px 12px;
+    border-radius:14px;
+    border:2px solid var(--pink-mid);
+    font-family:inherit;
+    font-size:1.05rem;
+    font-weight:700;
+    text-align:center;
+    background:var(--stat-bg);
+    color:var(--text);
+    outline:none;
+    transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .setpoint-row input[type=number]:focus{
+    border-color:var(--pink-dark);
+    box-shadow:0 0 0 3px rgba(255, 127, 172, 0.25);
+  }
+
+  button{
+    background:linear-gradient(135deg, var(--pink-deep), var(--pink-dark));
+    color:#fff;
+    border:none;
+    padding:10px 20px;
+    border-radius:14px;
+    font-family:inherit;
+    font-size:.92rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(232, 74, 138, 0.28);
+    transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  }
+  button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(232, 74, 138, 0.38);
+    filter:brightness(1.04);
+  }
+  button:active{
+    transform:scale(.96);
+  }
+
+  /* ---------- Footer & Toast ---------- */
+  .status-footer{
+    text-align:center;
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--text-muted);
+    margin-top:14px;
+  }
+  .dot{
+    display:inline-block; width:9px; height:9px; border-radius:50%;
+    background:var(--green-ok); margin-right:6px;
+    box-shadow:0 0 8px var(--green-ok);
+    animation:dotPulse 2s infinite;
+  }
+  .dot.off{
+    background:#bbb;
+    box-shadow:none;
+    animation:none;
+  }
+  @keyframes dotPulse{
+    0%, 100%{ opacity:1; }
+    50%{ opacity:0.45; }
+  }
+
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--pink-dark);
+    color:#fff;
+    padding:10px 20px;
+    border-radius:999px;
+    font-size:.86rem;
+    font-weight:700;
+    box-shadow:0 8px 24px rgba(232, 74, 138, 0.35);
+    opacity:0;
+    pointer-events:none;
+    z-index:100;
+    transition:opacity 0.25s ease, transform 0.25s cubic-bezier(.16,1,.3,1);
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-decor" id="bgDecor"></div>
+<div class="toast" id="toast">Tersimpan!</div>
+
+<div class="wrap">
+
+  <div class="top-bar">
+    <button class="pill-toggle" id="soundToggle" type="button" title="Aktifkan/Matikan Efek Suara">🔊 Suara: ON</button>
+    <button class="pill-toggle" id="themeToggle" type="button" title="Ganti Tema Terang/Gelap">🌙 Mode Gelap</button>
+  </div>
+
+  <header>
+    <div class="mascot-wrap" id="mascotWrap" title="Klik aku! 🥚">
+      <svg class="egg-mascot" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="70" rx="42" ry="55" fill="#fff6f2" stroke="#ff7fac" stroke-width="4"/>
+        <circle cx="37" cy="62" r="4" fill="#5a3346"/>
+        <circle cx="63" cy="62" r="4" fill="#5a3346"/>
+        <circle cx="38.5" cy="60.5" r="1.3" fill="#fff"/>
+        <circle cx="64.5" cy="60.5" r="1.3" fill="#fff"/>
+        <path d="M38 80 Q50 90 62 80" stroke="#e84a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="26" cy="74" r="6" fill="#ffb6d0" opacity=".75"/>
+        <circle cx="74" cy="74" r="6" fill="#ffb6d0" opacity=".75"/>
+      </svg>
+    </div>
+    <h1>Inkubator Telur Monitor 🌸</h1>
+    <p>Kendali kecepatan kipas & pantau suhu inkubator secara real-time</p>
+  </header>
+
+  <!-- ===================== FAN CONTROL (FITUR UTAMA) ===================== -->
+  <div class="card fan-card">
+    <h2>🌀 Kontrol Kecepatan Kipas Sirkulasi</h2>
+
+    <div class="fan-visual" id="fanVisual">
+      <div class="fan-ring"></div>
+      <svg id="fanSvg" class="fan-spin" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="#ffe3ef" stroke="#ff7fac" stroke-width="3"/>
+        <g fill="#ff7fac">
+          <path d="M50 50 Q30 10 50 8 Q65 10 50 50 Z"/>
+          <path d="M50 50 Q90 30 92 50 Q90 65 50 50 Z"/>
+          <path d="M50 50 Q70 90 50 92 Q35 90 50 50 Z"/>
+          <path d="M50 50 Q10 70 8 50 Q10 35 50 50 Z"/>
+        </g>
+        <circle cx="50" cy="50" r="9" fill="#e84a8a"/>
+        <circle cx="50" cy="50" r="3.5" fill="#fff6f2"/>
+      </svg>
+    </div>
+
+    <div class="speed-readout"><span id="speedValue">0</span>%</div>
+
+    <input type="range" id="speedSlider" min="0" max="100" value="0" step="5">
+    <div class="slider-labels"><span>0% (mati)</span><span>100% (maksimum)</span></div>
+
+    <div class="preset-row">
+      <button type="button" class="preset-btn" data-speed="30">30%</button>
+      <button type="button" class="preset-btn" data-speed="50">50%</button>
+      <button type="button" class="preset-btn" data-speed="75">75%</button>
+      <button type="button" class="preset-btn" data-speed="100">100%</button>
+    </div>
+
+    <div class="hint">🥚 Minimal kipas tetap berputar 30% di firmware ESP32 agar panas selalu merata, walau slider ini diset lebih rendah.</div>
+  </div>
+
+  <!-- ===================== SETPOINT SUHU ===================== -->
+  <div class="card">
+    <h2>🎯 Setpoint Suhu Heater</h2>
+    <div class="setpoint-row">
+      <input type="number" id="setpointInput" step="0.1" value="37.5"> <span style="font-weight:700;">°C</span>
+      <button id="btnSetpoint">Simpan Setpoint</button>
+    </div>
+    <div class="hint">Heater akan menyala otomatis jika suhu ruang (DHT22) di bawah nilai ini.</div>
+  </div>
+
+  <!-- ===================== MONITORING ===================== -->
+  <div class="card">
+    <h2>📊 Pemantauan Real-time</h2>
+    <div class="grid">
+      <div class="stat">
+        <div class="stat-inner">
+          <div class="label">Suhu Ruang (DHT22)</div>
+          <div class="value" id="valSuhuDht"><span id="suhuDht">--</span><span class="unit">°C</span></div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-inner">
+          <div class="label">Kelembapan</div>
+          <div class="value" id="valKelembapan"><span id="kelembapan">--</span><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-inner">
+          <div class="label">Suhu Thermocouple</div>
+          <div class="value" id="valSuhuMax"><span id="suhuMax">--</span><span class="unit">°C</span></div>
+        </div>
+      </div>
+      <div class="stat" id="statHeater">
+        <div class="stat-inner">
+          <div class="label">Status Heater</div>
+          <div class="value" id="valHeater"><span id="badgeHeater" class="badge off">OFF</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ALARM ===================== -->
+  <div class="card" id="alarmCard">
+    <h2>🚨 Status Keamanan</h2>
+    <div style="text-align:center;">
+      <span id="badgeAlarm" class="badge safe">AMAN 🌸</span>
+    </div>
+    <div class="hint" style="text-align:center;">Failsafe thermocouple berjalan lokal di ESP32 — tetap aktif walau koneksi ke halaman ini terputus.</div>
+  </div>
+
+  <div class="status-footer">
+    <span class="dot" id="connDot"></span><span id="connText">Menghubungkan ke Firebase...</span>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   SOUND EFFECTS (Web Audio API - Tanpa File Eksternal)
+   ========================================================= */
+const SoundFX = (() => {
+  let ctx = null;
+  let enabled = true;
+  let lastSliderSoundTime = 0;
+
+  function getContext(){
+    if(!ctx){
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if(AudioCtx) ctx = new AudioCtx();
+    }
+    if(ctx && ctx.state === 'suspended'){
+      ctx.resume().catch(() => {});
+    }
+    return ctx;
+  }
+
+  function playTone(freq, endFreq, duration, type = 'sine', volume = 0.08, delay = 0){
+    if(!enabled) return;
+    const audio = getContext();
+    if(!audio) return;
+
+    const now = audio.currentTime + delay;
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    if(endFreq && endFreq !== freq){
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+    }
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    osc.connect(gain);
+    gain.connect(audio.destination);
+
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  }
+
+  return {
+    isEnabled(){ return enabled; },
+    toggle(){
+      enabled = !enabled;
+      if(enabled) this.playChime();
+      return enabled;
+    },
+    unlock(){ getContext(); },
+    // Suara gelembung lucu saat klik / sentuh
+    playPop(baseFreq = 520){
+      playTone(baseFreq, baseFreq * 1.45, 0.11, 'sine', 0.07);
+    },
+    // Suara slider dengan nada naik sesuai kecepatan kipas
+    playSliderTick(percent){
+      const now = performance.now();
+      if(now - lastSliderSoundTime < 65) return;
+      lastSliderSoundTime = now;
+      const freq = 380 + (Number(percent) * 4.2);
+      playTone(freq, freq * 1.25, 0.08, 'sine', 0.055);
+    },
+    // Suara lonceng kawaii saat simpan setpoint / preset
+    playChime(){
+      playTone(1046.5, 1046.5, 0.16, 'sine', 0.075, 0);     // C6
+      playTone(1318.5, 1318.5, 0.22, 'sine', 0.075, 0.08);  // E6
+      playTone(1568.0, 1568.0, 0.28, 'sine', 0.065, 0.16);  // G6
+    },
+    // Suara lembut saat nilai sensor diperbarui
+    playSensorTick(){
+      playTone(987.77, 1174.66, 0.09, 'sine', 0.028, 0);
+    },
+    // Suara ceria saat maskot telur diklik
+    playMascot(){
+      playTone(660, 880, 0.11, 'triangle', 0.08, 0);
+      playTone(880, 1180, 0.15, 'triangle', 0.08, 0.09);
+    },
+    // Suara peringatan lembut saat overheat
+    playAlarm(){
+      playTone(880, 620, 0.22, 'triangle', 0.09, 0);
+      playTone(880, 620, 0.22, 'triangle', 0.09, 0.26);
+    }
+  };
+})();
+
+// Aktifkan AudioContext pada interaksi pertama user
+['pointerdown', 'keydown'].forEach(evt => {
+  window.addEventListener(evt, () => SoundFX.unlock(), { once: true });
+});
+
+const soundToggle = document.getElementById('soundToggle');
+soundToggle.addEventListener('click', () => {
+  const isOn = SoundFX.toggle();
+  soundToggle.textContent = isOn ? "🔊 Suara: ON" : "🔇 Suara: OFF";
+  soundToggle.classList.toggle('muted', !isOn);
+});
+
+/* =========================================================
+   THEME TOGGLE & INTERACTIVE MICRO-EFFECTS
+   ========================================================= */
+const themeToggle = document.getElementById('themeToggle');
+const rootEl = document.documentElement;
+
+function updateThemeButton(){
+  const isDark = rootEl.getAttribute('data-theme') === 'dark' ||
+    (!rootEl.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  themeToggle.textContent = isDark ? "🌸 Mode Terang" : "🌙 Mode Gelap";
+}
+updateThemeButton();
+
+themeToggle.addEventListener('click', () => {
+  const isCurrentlyDark = rootEl.getAttribute('data-theme') === 'dark' ||
+    (!rootEl.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const nextTheme = isCurrentlyDark ? 'light' : 'dark';
+  rootEl.setAttribute('data-theme', nextTheme);
+  updateThemeButton();
+  SoundFX.playPop(isCurrentlyDark ? 640 : 440);
+});
+
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* =========================================================
+   SMOOTH NUMBER ROLLING & VALUE BOUNCE ANIMATION
+   ========================================================= */
+const sensorState = {
+  suhuDht: null,
+  kelembapan: null,
+  suhuMax: null,
+  statusHeater: null
+};
+
+function animateSensorNumber(key, wrapperId, spanId, targetNum, decimals = 1){
+  const wrapper = document.getElementById(wrapperId);
+  const span = document.getElementById(spanId);
+  if(!wrapper || !span) return false;
+
+  const numericTarget = Number(targetNum);
+  if(isNaN(numericTarget)){
+    span.textContent = targetNum;
+    return false;
+  }
+
+  const prev = sensorState[key];
+  const formattedTarget = numericTarget.toFixed(decimals);
+
+  // Jika nilai sama persis dengan sebelumnya, tidak perlu animasi ulang
+  if(prev !== null && prev.toFixed(decimals) === formattedTarget){
+    return false;
+  }
+
+  // Trigger efek membal & kilau pada kotak nilai
+  wrapper.classList.remove('updated');
+  void wrapper.offsetWidth;
+  wrapper.classList.add('updated');
+
+  // Jika data pertama kali dimuat, langsung tampilkan
+  if(prev === null){
+    sensorState[key] = numericTarget;
+    span.textContent = formattedTarget;
+    return false;
+  }
+
+  // Smooth counting dari nilai lama ke nilai baru (500ms)
+  const startVal = prev;
+  sensorState[key] = numericTarget;
+  const duration = 500;
+  const startTime = performance.now();
+
+  function step(now){
+    const progress = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+    const current = startVal + (numericTarget - startVal) * ease;
+    span.textContent = current.toFixed(decimals);
+    if(progress < 1){
+      requestAnimationFrame(step);
+    }else{
+      span.textContent = formattedTarget;
+    }
+  }
+  requestAnimationFrame(step);
+  return true;
+}
+
+// Maskot telur lompat & keluarkan percikan + suara saat diklik
+const mascotWrap = document.getElementById('mascotWrap');
+mascotWrap.addEventListener('click', (e) => {
+  mascotWrap.classList.remove('happy');
+  void mascotWrap.offsetWidth;
+  mascotWrap.classList.add('happy');
+  SoundFX.playMascot();
+  spawnSparkles(e.clientX, e.clientY, ['🌸', '💖', '✨', '🥚']);
+});
+
+// Efek percikan kecil saat klik di area kosong/halaman
+function spawnSparkles(x, y, symbols = ['🌸', '✨']){
+  for(let i = 0; i < 5; i++){
+    const s = document.createElement('span');
+    s.className = 'click-sparkle';
+    s.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    const angle = (Math.PI * 2 * i) / 5 + (Math.random() * 0.5);
+    const dist = 24 + Math.random() * 28;
+    s.style.left = x + 'px';
+    s.style.top = y + 'px';
+    s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    s.style.setProperty('--dy', Math.sin(angle) * dist - 10 + 'px');
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 750);
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if(e.target.closest('button, input, .mascot-wrap')) return;
+  SoundFX.playPop(580);
+  spawnSparkles(e.clientX, e.clientY, ['🌸', '✨']);
+});
+
+/* =========================================================
+   KONEKSI FIREBASE (REST API + Database Secret / legacy token)
+   ========================================================= */
+const FIREBASE_HOST = "https://project-incubator-e66a2-default-rtdb.firebaseio.com";
+const FIREBASE_AUTH = "oLOMh7rY9SjMC03w7gmjrcBf7dHxUPs5faTkVd40";
+const PATH = "/inkubator";
+
+let isUserDraggingSlider = false;
+
+async function fbGet(key){
+  const res = await fetch(`${FIREBASE_HOST}${PATH}/${key}.json?auth=${FIREBASE_AUTH}`);
+  if(!res.ok) throw new Error("Gagal membaca " + key);
+  return res.json();
+}
+async function fbSet(key, value){
+  const res = await fetch(`${FIREBASE_HOST}${PATH}/${key}.json?auth=${FIREBASE_AUTH}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(value)
+  });
+  if(!res.ok) throw new Error("Gagal menyimpan " + key);
+  return res.json();
+}
+
+function setConn(ok){
+  document.getElementById('connDot').classList.toggle('off', !ok);
+  document.getElementById('connText').textContent = ok ? "Terhubung ke Firebase" : "Koneksi terputus, mencoba ulang...";
+}
+
+function updateFanVisual(speed){
+  const val = Number(speed) || 0;
+  const slider = document.getElementById('speedSlider');
+  slider.value = val;
+  slider.style.setProperty('--fill', val + '%');
+  document.getElementById('speedValue').textContent = val;
+
+  const dur = val > 0 ? Math.max(0.28, 4 - val / 28) : 0;
+  document.getElementById('fanSvg').style.animationDuration = dur + "s";
+  document.getElementById('fanVisual').classList.toggle('active', val > 0);
+}
+
+async function refreshData(){
+  try{
+    const [suhuDht, kelembapan, suhuMax, statusHeater, alarm, speedKipas, setpointSuhu] = await Promise.all([
+      fbGet("suhu_dht"), fbGet("kelembapan"), fbGet("suhu_thermocouple"),
+      fbGet("status_heater"), fbGet("alarm"), fbGet("speed_kipas"), fbGet("setpoint_suhu")
+    ]);
+
+    const changed1 = animateSensorNumber('suhuDht', 'valSuhuDht', 'suhuDht', suhuDht ?? 0, 1);
+    const changed2 = animateSensorNumber('kelembapan', 'valKelembapan', 'kelembapan', kelembapan ?? 0, 0);
+    const changed3 = animateSensorNumber('suhuMax', 'valSuhuMax', 'suhuMax', suhuMax ?? 0, 1);
+
+    const heaterBool = Boolean(statusHeater);
+    if(sensorState.statusHeater !== null && sensorState.statusHeater !== heaterBool){
+      const valHeater = document.getElementById('valHeater');
+      valHeater.classList.remove('updated');
+      void valHeater.offsetWidth;
+      valHeater.classList.add('updated');
+    }
+    sensorState.statusHeater = heaterBool;
+
+    const badgeHeater = document.getElementById('badgeHeater');
+    badgeHeater.textContent = heaterBool ? "ON" : "OFF";
+    badgeHeater.className = "badge " + (heaterBool ? "on" : "off");
+    document.getElementById('statHeater').classList.toggle('heater-active', heaterBool);
+
+    const alarmBool = Boolean(alarm);
+    const badgeAlarm = document.getElementById('badgeAlarm');
+    badgeAlarm.textContent = alarmBool ? "OVERHEAT! 🔥" : "AMAN 🌸";
+    badgeAlarm.className = "badge " + (alarmBool ? "alarm" : "safe");
+    document.getElementById('alarmCard').classList.toggle('alarm-active', alarmBool);
+
+    if(alarmBool){
+      SoundFX.playAlarm();
+    }else if(changed1 || changed2 || changed3){
+      SoundFX.playSensorTick();
+    }
+
+    if(!isUserDraggingSlider && typeof speedKipas === "number"){
+      updateFanVisual(speedKipas);
+    }
+    if(typeof setpointSuhu === "number" && document.activeElement.id !== "setpointInput"){
+      document.getElementById('setpointInput').value = setpointSuhu;
+    }
+
+    setConn(true);
+  }catch(e){
+    console.error(e);
+    setConn(false);
+  }
+}
+
+// ---- slider kipas ----
+const slider = document.getElementById('speedSlider');
+slider.addEventListener('input', () => {
+  isUserDraggingSlider = true;
+  updateFanVisual(slider.value);
+  SoundFX.playSliderTick(slider.value);
+});
+slider.addEventListener('change', async () => {
+  try{
+    await fbSet("speed_kipas", Number(slider.value));
+    SoundFX.playPop(720);
+    showToast(`🌀 Kipas diatur ke ${slider.value}%`);
+  }catch(e){ console.error(e); }
+  setTimeout(() => isUserDraggingSlider = false, 1500);
+});
+
+// ---- tombol preset kecepatan kipas ----
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const targetSpeed = Number(btn.dataset.speed);
+    isUserDraggingSlider = true;
+    updateFanVisual(targetSpeed);
+    SoundFX.playChime();
+    try{
+      await fbSet("speed_kipas", targetSpeed);
+      showToast(`🌀 Kipas diatur ke ${targetSpeed}%`);
+    }catch(e){ console.error(e); }
+    setTimeout(() => isUserDraggingSlider = false, 1500);
+  });
+});
+
+// ---- setpoint suhu ----
+document.getElementById('btnSetpoint').addEventListener('click', async () => {
+  const val = parseFloat(document.getElementById('setpointInput').value);
+  if(isNaN(val)) return;
+  try{
+    await fbSet("setpoint_suhu", val);
+    SoundFX.playChime();
+    const btn = document.getElementById('btnSetpoint');
+    const old = btn.textContent;
+    btn.textContent = "Tersimpan ✓";
+    showToast(`🎯 Setpoint ${val.toFixed(1)}°C tersimpan!`);
+    setTimeout(() => btn.textContent = old, 1200);
+  }catch(e){ console.error(e); }
+});
+
+// ---- polling tiap 2.5 detik ----
+refreshData();
+setInterval(refreshData, 2500);
+
+/* =========================================================
+   DEKORASI: kelopak sakura jatuh + telur-telur lucu di background
+   ========================================================= */
+(function decor(){
+  const container = document.getElementById('bgDecor');
+
+  // kelopak sakura
+  for(let i = 0; i < 24; i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random() * 100 + "%";
+    p.style.animationDuration = (7 + Math.random() * 8) + "s";
+    p.style.animationDelay = (-Math.random() * 12) + "s";
+    p.style.opacity = 0.35 + Math.random() * 0.4;
+    const size = 10 + Math.random() * 11;
+    p.style.width = size + "px";
+    p.style.height = size + "px";
+    container.appendChild(p);
+  }
+
+  // telur-telur lucu tersebar di background
+  const eggPositions = [
+    {top:"8%", left:"4%", size:68, rot:-10, delay:"0s"},
+    {top:"22%", left:"88%", size:54, rot:12, delay:"1.2s"},
+    {top:"48%", left:"2%", size:50, rot:8, delay:"2.4s"},
+    {top:"65%", left:"90%", size:64, rot:-8, delay:"0.8s"},
+    {top:"84%", left:"7%", size:58, rot:14, delay:"1.8s"},
+    {top:"91%", left:"78%", size:50, rot:-14, delay:"3s"},
+  ];
+  eggPositions.forEach(pos => {
+    const div = document.createElement('div');
+    div.className = 'egg-bg';
+    div.style.top = pos.top;
+    div.style.left = pos.left;
+    div.style.width = pos.size + "px";
+    div.style.setProperty('--rot', pos.rot + "deg");
+    div.style.animationDelay = pos.delay;
+    div.innerHTML = `
+      <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="70" rx="42" ry="55" fill="#ff7fac"/>
+        <circle cx="37" cy="62" r="4" fill="#5a3346"/>
+        <circle cx="63" cy="62" r="4" fill="#5a3346"/>
+        <path d="M38 80 Q50 88 62 80" stroke="#5a3346" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>`;
+    container.appendChild(div);
+  });
+})();
+</script>
+
+</body>
+</html>
