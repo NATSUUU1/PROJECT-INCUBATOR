@@ -15,13 +15,13 @@
     --pink-dark:#e84a8a;
     --peach:#ffe9dc;
     --cream:#fff8f5;
-    --card-bg:rgba(255, 255, 255, 0.68);
+    --card-bg:rgba(255, 255, 255, 0.72);
     --card-border:rgba(255, 182, 208, 0.85);
-    --stat-bg:rgba(255, 249, 247, 0.94);
+    --stat-bg:rgba(255, 249, 247, 0.95);
     --text:#5a3346;
-    --text-muted:rgba(90, 51, 70, 0.72);
+    --text-muted:rgba(90, 51, 70, 0.74);
     --shadow-color:rgba(232, 74, 138, 0.14);
-    --green-ok:#52c484;
+    --green-ok:#47b878;
     --red-alarm:#ff5c6c;
     --amber-heat:#ff9f43;
   }
@@ -34,12 +34,12 @@
       --pink-dark:#ffa3c8;
       --peach:#35202b;
       --cream:#1e1319;
-      --card-bg:rgba(43, 25, 36, 0.72);
+      --card-bg:rgba(43, 25, 36, 0.75);
       --card-border:rgba(255, 127, 172, 0.32);
       --stat-bg:rgba(33, 20, 27, 0.94);
       --text:#ffe6f0;
-      --text-muted:rgba(255, 230, 240, 0.72);
-      --shadow-color:rgba(0, 0, 0, 0.35);
+      --text-muted:rgba(255, 230, 240, 0.74);
+      --shadow-color:rgba(0, 0, 0, 0.38);
     }
   }
 
@@ -50,12 +50,12 @@
     --pink-dark:#ffa3c8;
     --peach:#35202b;
     --cream:#1e1319;
-    --card-bg:rgba(43, 25, 36, 0.72);
+    --card-bg:rgba(43, 25, 36, 0.75);
     --card-border:rgba(255, 127, 172, 0.32);
     --stat-bg:rgba(33, 20, 27, 0.94);
     --text:#ffe6f0;
-    --text-muted:rgba(255, 230, 240, 0.72);
-    --shadow-color:rgba(0, 0, 0, 0.35);
+    --text-muted:rgba(255, 230, 240, 0.74);
+    --shadow-color:rgba(0, 0, 0, 0.38);
   }
 
   *{ box-sizing:border-box; }
@@ -76,6 +76,77 @@
     transition:background 0.4s ease, color 0.3s ease;
   }
   html{ scroll-padding-top:env(safe-area-inset-top, 0px); }
+
+  /* ---------- Welcome Entrance Overlay ---------- */
+  .welcome-overlay{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(255, 182, 208, 0.45), transparent 60%),
+      linear-gradient(160deg, var(--pink-light), var(--peach), var(--cream));
+    backdrop-filter:blur(16px);
+    transition:opacity 0.65s cubic-bezier(.16,1,.3,1), transform 0.65s cubic-bezier(.16,1,.3,1);
+    cursor:pointer;
+  }
+  .welcome-overlay.hide{
+    opacity:0;
+    transform:translateY(-28px) scale(1.03);
+    pointer-events:none;
+  }
+  .welcome-egg{
+    width:86px;
+    margin-bottom:14px;
+    filter:drop-shadow(0 10px 20px rgba(232, 74, 138, 0.28));
+    animation:welcomeBounce 0.9s cubic-bezier(.34,1.56,.64,1) infinite alternate;
+  }
+  @keyframes welcomeBounce{
+    0%{ transform:translateY(0) rotate(-6deg) scale(0.96, 1.04); }
+    100%{ transform:translateY(-14px) rotate(6deg) scale(1.04, 0.96); }
+  }
+  .welcome-title{
+    font-size:1.65rem;
+    font-weight:700;
+    color:var(--pink-dark);
+    margin:0 0 6px;
+    animation:welcomeTextIn 0.55s ease both;
+  }
+  .welcome-sub{
+    font-size:.92rem;
+    font-weight:600;
+    color:var(--text-muted);
+    margin:0 0 18px;
+    animation:welcomeTextIn 0.55s 0.1s ease both;
+  }
+  @keyframes welcomeTextIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .welcome-bar{
+    width:210px;
+    height:8px;
+    border-radius:999px;
+    background:rgba(255, 127, 172, 0.22);
+    overflow:hidden;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .welcome-bar-fill{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--pink-deep), var(--pink-dark));
+    animation:loadFill 0.95s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  @keyframes loadFill{
+    0%{ width:0%; }
+    100%{ width:100%; }
+  }
 
   /* ---------- Background decor: sakura petals + floating eggs ---------- */
   .bg-decor{
@@ -117,19 +188,97 @@
     100%{ opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.25); }
   }
 
-  /* ---------- Layout & Header ---------- */
+  /* ---------- Layout & Top Status Bar ---------- */
   .wrap{
     position:relative; z-index:1;
     max-width:760px;
     margin:0 auto;
-    padding:22px 18px 64px;
+    padding:20px 18px 56px;
+  }
+
+  /* Desktop Split Layout: Tabel Pemantauan sejajar ke kanan */
+  @media (min-width: 900px){
+    .wrap{
+      max-width:1140px;
+      padding:26px 28px 60px;
+    }
   }
 
   .top-bar{
     display:flex;
-    justify-content:flex-end;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:14px;
+    opacity:0;
+    transform:translateY(-12px);
+    transition:opacity 0.5s ease, transform 0.5s ease;
+  }
+  body.page-ready .top-bar{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  .conn-pills{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
     gap:8px;
-    margin-bottom:6px;
+  }
+  .conn-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:var(--card-bg);
+    border:1.5px solid var(--card-border);
+    border-radius:999px;
+    padding:6px 13px;
+    font-size:.8rem;
+    font-weight:700;
+    color:var(--text);
+    backdrop-filter:blur(10px);
+    box-shadow:0 4px 12px var(--shadow-color);
+    transition:border-color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+  }
+  .conn-badge.connected{
+    border-color:rgba(71, 184, 120, 0.65);
+  }
+  .conn-badge.disconnected{
+    border-color:rgba(255, 92, 108, 0.75);
+    animation:shakeWarning 0.45s ease;
+  }
+  @keyframes shakeWarning{
+    0%, 100%{ transform:translateX(0); }
+    25%{ transform:translateX(-4px); }
+    75%{ transform:translateX(4px); }
+  }
+
+  .status-dot{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:#bbb;
+    flex-shrink:0;
+    transition:background 0.3s, box-shadow 0.3s;
+  }
+  .conn-badge.connected .status-dot{
+    background:var(--green-ok);
+    box-shadow:0 0 8px var(--green-ok);
+    animation:dotPulse 2s infinite;
+  }
+  .conn-badge.disconnected .status-dot{
+    background:var(--red-alarm);
+    box-shadow:0 0 8px var(--red-alarm);
+  }
+  @keyframes dotPulse{
+    0%, 100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:0.5; transform:scale(0.88); }
+  }
+
+  .controls-pills{
+    display:flex;
+    gap:8px;
+    margin-left:auto;
   }
   .pill-toggle{
     background:var(--card-bg);
@@ -153,14 +302,17 @@
     opacity:0.72;
   }
 
+  /* ---------- Header ---------- */
   header{
     text-align:center;
     margin-bottom:24px;
-    animation:fadeSlideDown 0.6s ease both;
+    opacity:0;
+    transform:translateY(16px) scale(0.97);
+    transition:opacity 0.6s cubic-bezier(.16,1,.3,1) 0.08s, transform 0.6s cubic-bezier(.16,1,.3,1) 0.08s;
   }
-  @keyframes fadeSlideDown{
-    from{ opacity:0; transform:translateY(-14px); }
-    to{ opacity:1; transform:translateY(0); }
+  body.page-ready header{
+    opacity:1;
+    transform:translateY(0) scale(1);
   }
 
   .mascot-wrap{
@@ -209,33 +361,67 @@
     color:var(--text-muted);
   }
 
-  /* ---------- Cards ---------- */
+  /* ---------- Main Dashboard Grid (Desktop: Kiri Kontrol, Kanan Tabel) ---------- */
+  .dashboard-grid{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .col-left, .col-right{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  @media (min-width: 900px){
+    .dashboard-grid{
+      display:grid;
+      grid-template-columns:1fr 1.15fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    .col-left, .col-right{
+      height:100%;
+      gap:20px;
+    }
+    .col-left .card:last-child,
+    .col-right .card:last-child{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+  }
+
+  /* ---------- Cards & Entrance Animation ---------- */
   .card{
     background:var(--card-bg);
     border:1.5px solid var(--card-border);
     border-radius:24px;
     padding:20px 22px;
-    margin-bottom:18px;
+    margin-bottom:0;
     box-shadow:
       0 10px 28px var(--shadow-color),
       inset 0 1px 0 rgba(255, 255, 255, 0.55);
     backdrop-filter:blur(12px);
     -webkit-backdrop-filter:blur(12px);
-    transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.3s ease;
-    animation:cardFadeUp 0.6s cubic-bezier(.16,1,.3,1) both;
+    opacity:0;
+    transform:translateY(26px) scale(0.97);
+    transition:
+      opacity 0.65s cubic-bezier(.16,1,.3,1),
+      transform 0.65s cubic-bezier(.16,1,.3,1),
+      box-shadow 0.25s ease,
+      border-color 0.3s ease;
   }
-  .card:nth-of-type(1){ animation-delay:0.06s; }
-  .card:nth-of-type(2){ animation-delay:0.14s; }
-  .card:nth-of-type(3){ animation-delay:0.22s; }
-  .card:nth-of-type(4){ animation-delay:0.30s; }
 
-  @keyframes cardFadeUp{
-    from{ opacity:0; transform:translateY(18px); }
-    to{ opacity:1; transform:translateY(0); }
-  }
+  body.page-ready .col-left .card:nth-child(1){ opacity:1; transform:translateY(0) scale(1); transition-delay:0.14s; }
+  body.page-ready .col-left .card:nth-child(2){ opacity:1; transform:translateY(0) scale(1); transition-delay:0.24s; }
+  body.page-ready .col-right .card:nth-child(1){ opacity:1; transform:translateY(0) scale(1); transition-delay:0.20s; }
+  body.page-ready .col-right .card:nth-child(2){ opacity:1; transform:translateY(0) scale(1); transition-delay:0.30s; }
 
   .card:hover{
-    transform:translateY(-3px);
+    transform:translateY(-3px) scale(1) !important;
+    transition-delay:0s !important;
     box-shadow:
       0 14px 32px var(--shadow-color),
       inset 0 1px 0 rgba(255, 255, 255, 0.65);
@@ -243,7 +429,7 @@
 
   .card h2{
     margin:0 0 14px;
-    font-size:1.06rem;
+    font-size:1.08rem;
     font-weight:700;
     color:var(--pink-dark);
     display:flex; align-items:center; gap:8px;
@@ -266,8 +452,8 @@
   }
 
   .fan-visual{
-    width:130px; height:130px;
-    margin:6px auto 14px;
+    width:128px; height:128px;
+    margin:4px auto 12px;
     position:relative;
     display:flex; align-items:center; justify-content:center;
   }
@@ -288,7 +474,7 @@
   }
 
   .fan-visual svg{
-    width:112px; height:112px;
+    width:110px; height:110px;
     transform-origin:50% 50%;
     filter:drop-shadow(0 4px 10px rgba(232, 74, 138, 0.2));
   }
@@ -302,7 +488,7 @@
   }
 
   .speed-readout{
-    font-size:2.35rem;
+    font-size:2.3rem;
     font-weight:700;
     color:var(--pink-dark);
     margin:2px 0 12px;
@@ -361,7 +547,7 @@
     background:var(--stat-bg);
     color:var(--pink-dark);
     border:1.5px solid var(--pink-mid);
-    padding:5px 12px;
+    padding:5px 13px;
     border-radius:999px;
     font-size:.8rem;
     font-weight:700;
@@ -380,7 +566,7 @@
     margin-top:12px;
   }
 
-  /* ---------- Monitoring Grid & Animated Moving Borders ---------- */
+  /* ---------- Monitoring Grid (Tabel Nilai di Kanan) & Animated Moving Borders ---------- */
   .grid{
     display:grid;
     grid-template-columns:repeat(2, 1fr);
@@ -393,14 +579,26 @@
   .stat{
     position:relative;
     border-radius:20px;
-    padding:2.5px; /* Ketebalan border animasi bergerak */
+    padding:2.5px;
     overflow:hidden;
     background:var(--card-border);
     box-shadow:0 6px 18px rgba(232, 74, 138, 0.12);
-    transition:transform 0.25s ease, box-shadow 0.3s ease;
+    opacity:0;
+    transform:scale(0.92) translateY(12px);
+    transition:
+      opacity 0.5s cubic-bezier(.34,1.56,.64,1),
+      transform 0.5s cubic-bezier(.34,1.56,.64,1),
+      box-shadow 0.3s ease;
   }
+
+  body.page-ready .stat:nth-child(1){ opacity:1; transform:scale(1) translateY(0); transition-delay:0.28s; }
+  body.page-ready .stat:nth-child(2){ opacity:1; transform:scale(1) translateY(0); transition-delay:0.35s; }
+  body.page-ready .stat:nth-child(3){ opacity:1; transform:scale(1) translateY(0); transition-delay:0.42s; }
+  body.page-ready .stat:nth-child(4){ opacity:1; transform:scale(1) translateY(0); transition-delay:0.49s; }
+
   .stat:hover{
-    transform:translateY(-3px);
+    transform:translateY(-3px) scale(1.01) !important;
+    transition-delay:0s !important;
     box-shadow:0 10px 24px rgba(232, 74, 138, 0.22);
   }
 
@@ -425,13 +623,11 @@
     z-index:0;
   }
 
-  /* Stagger animasi border tiap kotak agar terlihat mengalir harmonis */
   .stat:nth-child(1)::before{ animation-delay:0s; }
   .stat:nth-child(2)::before{ animation-delay:-0.9s; }
   .stat:nth-child(3)::before{ animation-delay:-1.8s; }
   .stat:nth-child(4)::before{ animation-delay:-2.7s; }
 
-  /* Warna border hangat & lebih cepat saat Heater menyala */
   .stat.heater-active{
     box-shadow:0 6px 22px rgba(255, 159, 67, 0.28);
   }
@@ -459,9 +655,10 @@
     z-index:1;
     background:var(--stat-bg);
     border-radius:17.5px;
-    padding:15px 12px;
+    padding:18px 12px;
     text-align:center;
     height:100%;
+    min-height:104px;
     display:flex;
     flex-direction:column;
     justify-content:center;
@@ -469,17 +666,16 @@
   }
 
   .stat .label{
-    font-size:.78rem;
+    font-size:.8rem;
     font-weight:600;
     color:var(--text-muted);
   }
 
-  /* Animasi tampilan nilai sensor */
   .stat .value{
     position:relative;
-    font-size:1.65rem;
+    font-size:1.72rem;
     font-weight:700;
-    margin-top:5px;
+    margin-top:6px;
     display:inline-flex;
     align-items:baseline;
     justify-content:center;
@@ -508,7 +704,7 @@
   }
 
   .stat .unit{
-    font-size:.86rem;
+    font-size:.88rem;
     font-weight:700;
     margin-left:3px;
     color:var(--text-muted);
@@ -605,63 +801,116 @@
     transform:scale(.96);
   }
 
-  /* ---------- Footer & Toast ---------- */
+  /* ---------- Footer & Stacked Toast Notifications ---------- */
   .status-footer{
     text-align:center;
-    font-size:.78rem;
+    font-size:.8rem;
     font-weight:600;
     color:var(--text-muted);
-    margin-top:14px;
-  }
-  .dot{
-    display:inline-block; width:9px; height:9px; border-radius:50%;
-    background:var(--green-ok); margin-right:6px;
-    box-shadow:0 0 8px var(--green-ok);
-    animation:dotPulse 2s infinite;
-  }
-  .dot.off{
-    background:#bbb;
-    box-shadow:none;
-    animation:none;
-  }
-  @keyframes dotPulse{
-    0%, 100%{ opacity:1; }
-    50%{ opacity:0.45; }
+    margin-top:20px;
   }
 
-  .toast{
+  .toast-container{
     position:fixed;
-    bottom:24px;
-    left:50%;
-    transform:translateX(-50%) translateY(20px);
-    background:var(--pink-dark);
-    color:#fff;
-    padding:10px 20px;
-    border-radius:999px;
-    font-size:.86rem;
-    font-weight:700;
-    box-shadow:0 8px 24px rgba(232, 74, 138, 0.35);
-    opacity:0;
+    bottom:20px;
+    right:20px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:10px;
+    z-index:200;
     pointer-events:none;
-    z-index:100;
-    transition:opacity 0.25s ease, transform 0.25s cubic-bezier(.16,1,.3,1);
+    max-width:calc(100vw - 32px);
   }
-  .toast.show{
+  @media (max-width: 600px){
+    .toast-container{
+      right:50%;
+      transform:translateX(50%);
+      align-items:center;
+      bottom:16px;
+    }
+  }
+
+  .toast-item{
+    background:var(--stat-bg);
+    color:var(--text);
+    border:2px solid var(--pink-mid);
+    padding:10px 18px;
+    border-radius:16px;
+    font-size:.85rem;
+    font-weight:700;
+    box-shadow:0 10px 26px rgba(0, 0, 0, 0.16);
+    backdrop-filter:blur(12px);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    opacity:0;
+    transform:translateY(16px) scale(0.94);
+    transition:opacity 0.3s ease, transform 0.35s cubic-bezier(.16,1,.3,1);
+  }
+  .toast-item.show{
     opacity:1;
-    transform:translateX(-50%) translateY(0);
+    transform:translateY(0) scale(1);
+  }
+  .toast-item.success{
+    border-color:var(--green-ok);
+    background:linear-gradient(135deg, rgba(71, 184, 120, 0.94), rgba(56, 158, 100, 0.94));
+    color:#fff;
+  }
+  .toast-item.error{
+    border-color:var(--red-alarm);
+    background:linear-gradient(135deg, rgba(255, 92, 108, 0.95), rgba(224, 56, 75, 0.95));
+    color:#fff;
+  }
+  .toast-item.info{
+    background:linear-gradient(135deg, var(--pink-deep), var(--pink-dark));
+    border-color:rgba(255,255,255,0.4);
+    color:#fff;
   }
 </style>
 </head>
 <body>
 
+<!-- Animasi Layar Pembuka saat masuk ke link website -->
+<div class="welcome-overlay" id="welcomeOverlay" title="Klik untuk langsung masuk">
+  <svg class="welcome-egg" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="70" rx="42" ry="55" fill="#fff6f2" stroke="#ff7fac" stroke-width="4.5"/>
+    <circle cx="37" cy="62" r="4.5" fill="#5a3346"/>
+    <circle cx="63" cy="62" r="4.5" fill="#5a3346"/>
+    <circle cx="38.5" cy="60.5" r="1.5" fill="#fff"/>
+    <circle cx="64.5" cy="60.5" r="1.5" fill="#fff"/>
+    <path d="M38 80 Q50 92 62 80" stroke="#e84a8a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <circle cx="25" cy="74" r="6.5" fill="#ffb6d0" opacity=".85"/>
+    <circle cx="75" cy="74" r="6.5" fill="#ffb6d0" opacity=".85"/>
+  </svg>
+  <h2 class="welcome-title">Inkubator Telur Monitor 🌸</h2>
+  <p class="welcome-sub">Menghubungkan ke Firebase & ESP32...</p>
+  <div class="welcome-bar"><div class="welcome-bar-fill"></div></div>
+</div>
+
 <div class="bg-decor" id="bgDecor"></div>
-<div class="toast" id="toast">Tersimpan!</div>
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="wrap">
 
   <div class="top-bar">
-    <button class="pill-toggle" id="soundToggle" type="button" title="Aktifkan/Matikan Efek Suara">🔊 Suara: ON</button>
-    <button class="pill-toggle" id="themeToggle" type="button" title="Ganti Tema Terang/Gelap">🌙 Mode Gelap</button>
+    <!-- Indikator Status Koneksi Firebase & ESP32 -->
+    <div class="conn-pills">
+      <div class="conn-badge" id="pillFirebase">
+        <span class="status-dot"></span>
+        <span id="textFirebase">Firebase: Memeriksa...</span>
+      </div>
+      <div class="conn-badge" id="pillEsp32">
+        <span class="status-dot"></span>
+        <span id="textEsp32">ESP32: Memeriksa...</span>
+      </div>
+    </div>
+
+    <!-- Tombol Suara & Tema -->
+    <div class="controls-pills">
+      <button class="pill-toggle" id="soundToggle" type="button" title="Aktifkan/Matikan Efek Suara">🔊 Suara: ON</button>
+      <button class="pill-toggle" id="themeToggle" type="button" title="Ganti Tema Terang/Gelap">🌙 Mode Gelap</button>
+    </div>
   </div>
 
   <header>
@@ -681,97 +930,125 @@
     <p>Kendali kecepatan kipas & pantau suhu inkubator secara real-time</p>
   </header>
 
-  <!-- ===================== FAN CONTROL (FITUR UTAMA) ===================== -->
-  <div class="card fan-card">
-    <h2>🌀 Kontrol Kecepatan Kipas Sirkulasi</h2>
+  <!-- ===================== GRID UTAMA (KIRI: KONTROL, KANAN: TABEL MONITORING) ===================== -->
+  <div class="dashboard-grid">
 
-    <div class="fan-visual" id="fanVisual">
-      <div class="fan-ring"></div>
-      <svg id="fanSvg" class="fan-spin" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="46" fill="#ffe3ef" stroke="#ff7fac" stroke-width="3"/>
-        <g fill="#ff7fac">
-          <path d="M50 50 Q30 10 50 8 Q65 10 50 50 Z"/>
-          <path d="M50 50 Q90 30 92 50 Q90 65 50 50 Z"/>
-          <path d="M50 50 Q70 90 50 92 Q35 90 50 50 Z"/>
-          <path d="M50 50 Q10 70 8 50 Q10 35 50 50 Z"/>
-        </g>
-        <circle cx="50" cy="50" r="9" fill="#e84a8a"/>
-        <circle cx="50" cy="50" r="3.5" fill="#fff6f2"/>
-      </svg>
-    </div>
+    <!-- KOLOM KIRI: KONTROL KIPAS & SETPOINT -->
+    <div class="col-left">
+      <div class="card fan-card">
+        <h2>🌀 Kontrol Kecepatan Kipas Sirkulasi</h2>
 
-    <div class="speed-readout"><span id="speedValue">0</span>%</div>
-
-    <input type="range" id="speedSlider" min="0" max="100" value="0" step="5">
-    <div class="slider-labels"><span>0% (mati)</span><span>100% (maksimum)</span></div>
-
-    <div class="preset-row">
-      <button type="button" class="preset-btn" data-speed="30">30%</button>
-      <button type="button" class="preset-btn" data-speed="50">50%</button>
-      <button type="button" class="preset-btn" data-speed="75">75%</button>
-      <button type="button" class="preset-btn" data-speed="100">100%</button>
-    </div>
-
-    <div class="hint">🥚 Minimal kipas tetap berputar 30% di firmware ESP32 agar panas selalu merata, walau slider ini diset lebih rendah.</div>
-  </div>
-
-  <!-- ===================== SETPOINT SUHU ===================== -->
-  <div class="card">
-    <h2>🎯 Setpoint Suhu Heater</h2>
-    <div class="setpoint-row">
-      <input type="number" id="setpointInput" step="0.1" value="37.5"> <span style="font-weight:700;">°C</span>
-      <button id="btnSetpoint">Simpan Setpoint</button>
-    </div>
-    <div class="hint">Heater akan menyala otomatis jika suhu ruang (DHT22) di bawah nilai ini.</div>
-  </div>
-
-  <!-- ===================== MONITORING ===================== -->
-  <div class="card">
-    <h2>📊 Pemantauan Real-time</h2>
-    <div class="grid">
-      <div class="stat">
-        <div class="stat-inner">
-          <div class="label">Suhu Ruang (DHT22)</div>
-          <div class="value" id="valSuhuDht"><span id="suhuDht">--</span><span class="unit">°C</span></div>
+        <div class="fan-visual" id="fanVisual">
+          <div class="fan-ring"></div>
+          <svg id="fanSvg" class="fan-spin" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="46" fill="#ffe3ef" stroke="#ff7fac" stroke-width="3"/>
+            <g fill="#ff7fac">
+              <path d="M50 50 Q30 10 50 8 Q65 10 50 50 Z"/>
+              <path d="M50 50 Q90 30 92 50 Q90 65 50 50 Z"/>
+              <path d="M50 50 Q70 90 50 92 Q35 90 50 50 Z"/>
+              <path d="M50 50 Q10 70 8 50 Q10 35 50 50 Z"/>
+            </g>
+            <circle cx="50" cy="50" r="9" fill="#e84a8a"/>
+            <circle cx="50" cy="50" r="3.5" fill="#fff6f2"/>
+          </svg>
         </div>
+
+        <div class="speed-readout"><span id="speedValue">0</span>%</div>
+
+        <input type="range" id="speedSlider" min="0" max="100" value="0" step="5">
+        <div class="slider-labels"><span>0% (mati)</span><span>100% (maksimum)</span></div>
+
+        <div class="preset-row">
+          <button type="button" class="preset-btn" data-speed="30">30%</button>
+          <button type="button" class="preset-btn" data-speed="50">50%</button>
+          <button type="button" class="preset-btn" data-speed="75">75%</button>
+          <button type="button" class="preset-btn" data-speed="100">100%</button>
+        </div>
+
+        <div class="hint">🥚 Minimal kipas tetap berputar 30% di firmware ESP32 agar panas selalu merata, walau slider ini diset lebih rendah.</div>
       </div>
-      <div class="stat">
-        <div class="stat-inner">
-          <div class="label">Kelembapan</div>
-          <div class="value" id="valKelembapan"><span id="kelembapan">--</span><span class="unit">%</span></div>
+
+      <div class="card">
+        <h2>🎯 Setpoint Suhu Heater</h2>
+        <div class="setpoint-row">
+          <input type="number" id="setpointInput" step="0.1" value="37.5"> <span style="font-weight:700;">°C</span>
+          <button id="btnSetpoint">Simpan Setpoint</button>
         </div>
-      </div>
-      <div class="stat">
-        <div class="stat-inner">
-          <div class="label">Suhu Thermocouple</div>
-          <div class="value" id="valSuhuMax"><span id="suhuMax">--</span><span class="unit">°C</span></div>
-        </div>
-      </div>
-      <div class="stat" id="statHeater">
-        <div class="stat-inner">
-          <div class="label">Status Heater</div>
-          <div class="value" id="valHeater"><span id="badgeHeater" class="badge off">OFF</span></div>
-        </div>
+        <div class="hint">Heater akan menyala otomatis jika suhu ruang (DHT22) di bawah nilai ini.</div>
       </div>
     </div>
-  </div>
 
-  <!-- ===================== ALARM ===================== -->
-  <div class="card" id="alarmCard">
-    <h2>🚨 Status Keamanan</h2>
-    <div style="text-align:center;">
-      <span id="badgeAlarm" class="badge safe">AMAN 🌸</span>
+    <!-- KOLOM KANAN: TABEL PEMANTAUAN REAL-TIME & KEAMANAN -->
+    <div class="col-right">
+      <div class="card">
+        <h2>📊 Tabel Pemantauan Real-time</h2>
+        <div class="grid">
+          <div class="stat">
+            <div class="stat-inner">
+              <div class="label">Suhu Ruang (DHT22)</div>
+              <div class="value" id="valSuhuDht"><span id="suhuDht">--</span><span class="unit">°C</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-inner">
+              <div class="label">Kelembapan</div>
+              <div class="value" id="valKelembapan"><span id="kelembapan">--</span><span class="unit">%</span></div>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-inner">
+              <div class="label">Suhu Thermocouple</div>
+              <div class="value" id="valSuhuMax"><span id="suhuMax">--</span><span class="unit">°C</span></div>
+            </div>
+          </div>
+          <div class="stat" id="statHeater">
+            <div class="stat-inner">
+              <div class="label">Status Heater</div>
+              <div class="value" id="valHeater"><span id="badgeHeater" class="badge off">OFF</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="alarmCard">
+        <h2>🚨 Status Keamanan</h2>
+        <div style="text-align:center; margin:4px 0;">
+          <span id="badgeAlarm" class="badge safe">AMAN 🌸</span>
+        </div>
+        <div class="hint" style="text-align:center;">Failsafe thermocouple berjalan lokal di ESP32 — tetap aktif walau koneksi ke halaman ini terputus.</div>
+      </div>
     </div>
-    <div class="hint" style="text-align:center;">Failsafe thermocouple berjalan lokal di ESP32 — tetap aktif walau koneksi ke halaman ini terputus.</div>
+
   </div>
 
-  <div class="status-footer">
-    <span class="dot" id="connDot"></span><span id="connText">Menghubungkan ke Firebase...</span>
+  <div class="status-footer" id="footerStatus">
+    Sinkronisasi otomatis setiap 2.5 detik • 🌸 Kawaii Incubator Dashboard
   </div>
 
 </div>
 
 <script>
+/* =========================================================
+   WELCOME ENTRANCE ANIMATION
+   ========================================================= */
+const welcomeOverlay = document.getElementById('welcomeOverlay');
+let pageEntered = false;
+
+function enterPage(){
+  if(pageEntered) return;
+  pageEntered = true;
+  welcomeOverlay.classList.add('hide');
+  document.body.classList.add('page-ready');
+  setTimeout(() => {
+    if(welcomeOverlay.parentNode) welcomeOverlay.remove();
+  }, 700);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(enterPage, 950);
+});
+welcomeOverlay.addEventListener('click', enterPage);
+
 /* =========================================================
    SOUND EFFECTS (Web Audio API - Tanpa File Eksternal)
    ========================================================= */
@@ -825,11 +1102,9 @@ const SoundFX = (() => {
       return enabled;
     },
     unlock(){ getContext(); },
-    // Suara gelembung lucu saat klik / sentuh
     playPop(baseFreq = 520){
       playTone(baseFreq, baseFreq * 1.45, 0.11, 'sine', 0.07);
     },
-    // Suara slider dengan nada naik sesuai kecepatan kipas
     playSliderTick(percent){
       const now = performance.now();
       if(now - lastSliderSoundTime < 65) return;
@@ -837,22 +1112,26 @@ const SoundFX = (() => {
       const freq = 380 + (Number(percent) * 4.2);
       playTone(freq, freq * 1.25, 0.08, 'sine', 0.055);
     },
-    // Suara lonceng kawaii saat simpan setpoint / preset
     playChime(){
-      playTone(1046.5, 1046.5, 0.16, 'sine', 0.075, 0);     // C6
-      playTone(1318.5, 1318.5, 0.22, 'sine', 0.075, 0.08);  // E6
-      playTone(1568.0, 1568.0, 0.28, 'sine', 0.065, 0.16);  // G6
+      playTone(1046.5, 1046.5, 0.16, 'sine', 0.075, 0);
+      playTone(1318.5, 1318.5, 0.22, 'sine', 0.075, 0.08);
+      playTone(1568.0, 1568.0, 0.28, 'sine', 0.065, 0.16);
     },
-    // Suara lembut saat nilai sensor diperbarui
+    playConnect(){
+      playTone(880, 1174.66, 0.15, 'sine', 0.065, 0);
+      playTone(1318.5, 1568.0, 0.22, 'sine', 0.065, 0.1);
+    },
+    playDisconnect(){
+      playTone(587.33, 392.0, 0.22, 'triangle', 0.08, 0);
+      playTone(440.0, 329.63, 0.26, 'triangle', 0.08, 0.18);
+    },
     playSensorTick(){
-      playTone(987.77, 1174.66, 0.09, 'sine', 0.028, 0);
+      playTone(987.77, 1174.66, 0.09, 'sine', 0.025, 0);
     },
-    // Suara ceria saat maskot telur diklik
     playMascot(){
       playTone(660, 880, 0.11, 'triangle', 0.08, 0);
       playTone(880, 1180, 0.15, 'triangle', 0.08, 0.09);
     },
-    // Suara peringatan lembut saat overheat
     playAlarm(){
       playTone(880, 620, 0.22, 'triangle', 0.09, 0);
       playTone(880, 620, 0.22, 'triangle', 0.09, 0.26);
@@ -860,7 +1139,6 @@ const SoundFX = (() => {
   };
 })();
 
-// Aktifkan AudioContext pada interaksi pertama user
 ['pointerdown', 'keydown'].forEach(evt => {
   window.addEventListener(evt, () => SoundFX.unlock(), { once: true });
 });
@@ -871,6 +1149,26 @@ soundToggle.addEventListener('click', () => {
   soundToggle.textContent = isOn ? "🔊 Suara: ON" : "🔇 Suara: OFF";
   soundToggle.classList.toggle('muted', !isOn);
 });
+
+/* =========================================================
+   STACKED TOAST NOTIFICATION SYSTEM
+   ========================================================= */
+function showNotification(message, type = 'info', duration = 3400){
+  const container = document.getElementById('toastContainer');
+  const item = document.createElement('div');
+  item.className = `toast-item ${type}`;
+  item.textContent = message;
+  container.appendChild(item);
+
+  requestAnimationFrame(() => {
+    item.classList.add('show');
+  });
+
+  setTimeout(() => {
+    item.classList.remove('show');
+    setTimeout(() => item.remove(), 350);
+  }, duration);
+}
 
 /* =========================================================
    THEME TOGGLE & INTERACTIVE MICRO-EFFECTS
@@ -893,15 +1191,6 @@ themeToggle.addEventListener('click', () => {
   updateThemeButton();
   SoundFX.playPop(isCurrentlyDark ? 640 : 440);
 });
-
-let toastTimer;
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
-}
 
 /* =========================================================
    SMOOTH NUMBER ROLLING & VALUE BOUNCE ANIMATION
@@ -927,24 +1216,20 @@ function animateSensorNumber(key, wrapperId, spanId, targetNum, decimals = 1){
   const prev = sensorState[key];
   const formattedTarget = numericTarget.toFixed(decimals);
 
-  // Jika nilai sama persis dengan sebelumnya, tidak perlu animasi ulang
   if(prev !== null && prev.toFixed(decimals) === formattedTarget){
     return false;
   }
 
-  // Trigger efek membal & kilau pada kotak nilai
   wrapper.classList.remove('updated');
   void wrapper.offsetWidth;
   wrapper.classList.add('updated');
 
-  // Jika data pertama kali dimuat, langsung tampilkan
   if(prev === null){
     sensorState[key] = numericTarget;
     span.textContent = formattedTarget;
     return false;
   }
 
-  // Smooth counting dari nilai lama ke nilai baru (500ms)
   const startVal = prev;
   sensorState[key] = numericTarget;
   const duration = 500;
@@ -952,7 +1237,7 @@ function animateSensorNumber(key, wrapperId, spanId, targetNum, decimals = 1){
 
   function step(now){
     const progress = Math.min((now - startTime) / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+    const ease = 1 - Math.pow(1 - progress, 3);
     const current = startVal + (numericTarget - startVal) * ease;
     span.textContent = current.toFixed(decimals);
     if(progress < 1){
@@ -965,7 +1250,6 @@ function animateSensorNumber(key, wrapperId, spanId, targetNum, decimals = 1){
   return true;
 }
 
-// Maskot telur lompat & keluarkan percikan + suara saat diklik
 const mascotWrap = document.getElementById('mascotWrap');
 mascotWrap.addEventListener('click', (e) => {
   mascotWrap.classList.remove('happy');
@@ -975,7 +1259,6 @@ mascotWrap.addEventListener('click', (e) => {
   spawnSparkles(e.clientX, e.clientY, ['🌸', '💖', '✨', '🥚']);
 });
 
-// Efek percikan kecil saat klik di area kosong/halaman
 function spawnSparkles(x, y, symbols = ['🌸', '✨']){
   for(let i = 0; i < 5; i++){
     const s = document.createElement('span');
@@ -993,25 +1276,30 @@ function spawnSparkles(x, y, symbols = ['🌸', '✨']){
 }
 
 document.addEventListener('click', (e) => {
-  if(e.target.closest('button, input, .mascot-wrap')) return;
+  if(e.target.closest('button, input, .mascot-wrap, .welcome-overlay')) return;
   SoundFX.playPop(580);
   spawnSparkles(e.clientX, e.clientY, ['🌸', '✨']);
 });
 
 /* =========================================================
-   KONEKSI FIREBASE (REST API + Database Secret / legacy token)
+   KONEKSI FIREBASE & DETEKSI STATUS ESP32
    ========================================================= */
 const FIREBASE_HOST = "https://project-incubator-e66a2-default-rtdb.firebaseio.com";
 const FIREBASE_AUTH = "oLOMh7rY9SjMC03w7gmjrcBf7dHxUPs5faTkVd40";
 const PATH = "/inkubator";
 
 let isUserDraggingSlider = false;
+let firebaseConnected = null;
+let esp32Connected = null;
+let lastHeartbeatVal = null;
+let lastEsp32SeenAt = 0;
 
-async function fbGet(key){
-  const res = await fetch(`${FIREBASE_HOST}${PATH}/${key}.json?auth=${FIREBASE_AUTH}`);
-  if(!res.ok) throw new Error("Gagal membaca " + key);
+async function fbGetAll(){
+  const res = await fetch(`${FIREBASE_HOST}${PATH}.json?auth=${FIREBASE_AUTH}`);
+  if(!res.ok) throw new Error("Gagal membaca data Firebase");
   return res.json();
 }
+
 async function fbSet(key, value){
   const res = await fetch(`${FIREBASE_HOST}${PATH}/${key}.json?auth=${FIREBASE_AUTH}`, {
     method: "PUT",
@@ -1022,9 +1310,75 @@ async function fbSet(key, value){
   return res.json();
 }
 
-function setConn(ok){
-  document.getElementById('connDot').classList.toggle('off', !ok);
-  document.getElementById('connText').textContent = ok ? "Terhubung ke Firebase" : "Koneksi terputus, mencoba ulang...";
+function updateConnectionStatus(isFbOk, isEspOk){
+  const pillFb = document.getElementById('pillFirebase');
+  const textFb = document.getElementById('textFirebase');
+  const pillEsp = document.getElementById('pillEsp32');
+  const textEsp = document.getElementById('textEsp32');
+
+  // --- Status Firebase ---
+  if(firebaseConnected !== isFbOk){
+    firebaseConnected = isFbOk;
+    pillFb.classList.toggle('connected', isFbOk);
+    pillFb.classList.toggle('disconnected', !isFbOk);
+    textFb.textContent = isFbOk ? "Firebase: Terhubung" : "Firebase: Terputus";
+
+    if(isFbOk){
+      showNotification("🔥 Terhubung ke Firebase!", "success", 3200);
+      SoundFX.playConnect();
+    }else{
+      showNotification("⚠️ Terputus dari Firebase & ESP32!", "error", 4200);
+      SoundFX.playDisconnect();
+    }
+  }
+
+  // --- Status ESP32 ---
+  const effectiveEsp = isFbOk ? isEspOk : false;
+  if(esp32Connected !== effectiveEsp){
+    const prevEsp = esp32Connected;
+    esp32Connected = effectiveEsp;
+    pillEsp.classList.toggle('connected', effectiveEsp);
+    pillEsp.classList.toggle('disconnected', !effectiveEsp);
+    textEsp.textContent = effectiveEsp ? "ESP32: Terhubung" : "ESP32: Terputus";
+
+    // Tampilkan notifikasi ESP32 hanya jika perubahan terjadi saat Firebase terhubung
+    // (jika Firebase putus, notifikasi gabungan sudah muncul di atas)
+    if(isFbOk){
+      const delay = (prevEsp === null) ? 350 : 0;
+      setTimeout(() => {
+        if(effectiveEsp){
+          showNotification("🤖 Terhubung ke ESP32!", "success", 3400);
+          SoundFX.playConnect();
+        }else{
+          showNotification("⚠️ Terputus dari ESP32!", "error", 4200);
+          SoundFX.playDisconnect();
+        }
+      }, delay);
+    }
+  }
+}
+
+function checkEsp32Online(data){
+  if(!data || typeof data !== 'object') return false;
+
+  // 1. Cek jika ESP32 mengirim status boolean eksplisit
+  if(data.esp32_online === false || data.status_esp32 === false) return false;
+
+  // 2. Cek jika ESP32 mengirim heartbeat / uptime / millis / timestamp
+  const hb = data.heartbeat ?? data.uptime ?? data.millis ?? data.last_update ?? data.timestamp;
+  if(hb !== undefined && hb !== null){
+    const hbStr = String(hb);
+    if(lastHeartbeatVal !== hbStr){
+      lastHeartbeatVal = hbStr;
+      lastEsp32SeenAt = Date.now();
+    }
+    return (Date.now() - lastEsp32SeenAt) < 12000;
+  }
+
+  // 3. Fallback: pastikan data sensor dari ESP32 tersedia di Firebase
+  const hasTelemetry = (data.suhu_dht !== undefined && data.suhu_dht !== null) ||
+                       (data.suhu_thermocouple !== undefined && data.suhu_thermocouple !== null);
+  return hasTelemetry;
 }
 
 function updateFanVisual(speed){
@@ -1041,10 +1395,17 @@ function updateFanVisual(speed){
 
 async function refreshData(){
   try{
-    const [suhuDht, kelembapan, suhuMax, statusHeater, alarm, speedKipas, setpointSuhu] = await Promise.all([
-      fbGet("suhu_dht"), fbGet("kelembapan"), fbGet("suhu_thermocouple"),
-      fbGet("status_heater"), fbGet("alarm"), fbGet("speed_kipas"), fbGet("setpoint_suhu")
-    ]);
+    const data = await fbGetAll();
+    const isEspOnline = checkEsp32Online(data);
+    updateConnectionStatus(true, isEspOnline);
+
+    const suhuDht = data?.suhu_dht;
+    const kelembapan = data?.kelembapan;
+    const suhuMax = data?.suhu_thermocouple;
+    const statusHeater = data?.status_heater;
+    const alarm = data?.alarm;
+    const speedKipas = data?.speed_kipas;
+    const setpointSuhu = data?.setpoint_suhu;
 
     const changed1 = animateSensorNumber('suhuDht', 'valSuhuDht', 'suhuDht', suhuDht ?? 0, 1);
     const changed2 = animateSensorNumber('kelembapan', 'valKelembapan', 'kelembapan', kelembapan ?? 0, 0);
@@ -1082,11 +1443,9 @@ async function refreshData(){
     if(typeof setpointSuhu === "number" && document.activeElement.id !== "setpointInput"){
       document.getElementById('setpointInput').value = setpointSuhu;
     }
-
-    setConn(true);
   }catch(e){
     console.error(e);
-    setConn(false);
+    updateConnectionStatus(false, false);
   }
 }
 
@@ -1101,8 +1460,11 @@ slider.addEventListener('change', async () => {
   try{
     await fbSet("speed_kipas", Number(slider.value));
     SoundFX.playPop(720);
-    showToast(`🌀 Kipas diatur ke ${slider.value}%`);
-  }catch(e){ console.error(e); }
+    showNotification(`🌀 Kipas diatur ke ${slider.value}%`, "info", 2200);
+  }catch(e){
+    console.error(e);
+    showNotification("❌ Gagal mengirim kecepatan kipas", "error", 2600);
+  }
   setTimeout(() => isUserDraggingSlider = false, 1500);
 });
 
@@ -1115,8 +1477,11 @@ document.querySelectorAll('.preset-btn').forEach(btn => {
     SoundFX.playChime();
     try{
       await fbSet("speed_kipas", targetSpeed);
-      showToast(`🌀 Kipas diatur ke ${targetSpeed}%`);
-    }catch(e){ console.error(e); }
+      showNotification(`🌀 Kipas diatur ke ${targetSpeed}%`, "info", 2200);
+    }catch(e){
+      console.error(e);
+      showNotification("❌ Gagal mengirim kecepatan kipas", "error", 2600);
+    }
     setTimeout(() => isUserDraggingSlider = false, 1500);
   });
 });
@@ -1131,9 +1496,12 @@ document.getElementById('btnSetpoint').addEventListener('click', async () => {
     const btn = document.getElementById('btnSetpoint');
     const old = btn.textContent;
     btn.textContent = "Tersimpan ✓";
-    showToast(`🎯 Setpoint ${val.toFixed(1)}°C tersimpan!`);
+    showNotification(`🎯 Setpoint ${val.toFixed(1)}°C tersimpan!`, "info", 2400);
     setTimeout(() => btn.textContent = old, 1200);
-  }catch(e){ console.error(e); }
+  }catch(e){
+    console.error(e);
+    showNotification("❌ Gagal menyimpan setpoint", "error", 2600);
+  }
 });
 
 // ---- polling tiap 2.5 detik ----
@@ -1146,7 +1514,6 @@ setInterval(refreshData, 2500);
 (function decor(){
   const container = document.getElementById('bgDecor');
 
-  // kelopak sakura
   for(let i = 0; i < 24; i++){
     const p = document.createElement('div');
     p.className = 'petal';
@@ -1160,14 +1527,13 @@ setInterval(refreshData, 2500);
     container.appendChild(p);
   }
 
-  // telur-telur lucu tersebar di background
   const eggPositions = [
-    {top:"8%", left:"4%", size:68, rot:-10, delay:"0s"},
-    {top:"22%", left:"88%", size:54, rot:12, delay:"1.2s"},
+    {top:"8%", left:"3%", size:68, rot:-10, delay:"0s"},
+    {top:"22%", left:"92%", size:54, rot:12, delay:"1.2s"},
     {top:"48%", left:"2%", size:50, rot:8, delay:"2.4s"},
-    {top:"65%", left:"90%", size:64, rot:-8, delay:"0.8s"},
-    {top:"84%", left:"7%", size:58, rot:14, delay:"1.8s"},
-    {top:"91%", left:"78%", size:50, rot:-14, delay:"3s"},
+    {top:"65%", left:"93%", size:64, rot:-8, delay:"0.8s"},
+    {top:"84%", left:"5%", size:58, rot:14, delay:"1.8s"},
+    {top:"91%", left:"86%", size:50, rot:-14, delay:"3s"},
   ];
   eggPositions.forEach(pos => {
     const div = document.createElement('div');
