@@ -29,8 +29,8 @@
 #include <FirebaseESP32.h>
 
 // ------------------- KONFIGURASI WIFI -------------------
-#define WIFI_SSID     "Kjiwonn"
-#define WIFI_PASSWORD "geewonii28"
+#define WIFI_SSID     "VINKEJU"
+#define WIFI_PASSWORD "kejuenak28"
 
 // ------------------- KONFIGURASI FIREBASE -------------------
 #define FIREBASE_HOST "project-incubator-e66a2-default-rtdb.firebaseio.com"
@@ -50,6 +50,8 @@ FirebaseAuth   firebaseAuth;
 #define PIN_ENA       32   // PWM kecepatan kipas
 #define PIN_IN1       33
 #define PIN_IN2       14
+#define PIN_SDA_LCD   21   // I2C LCD - SDA
+#define PIN_SCL_LCD   22   // I2C LCD - SCL
 
 // ------------------- OBJEK SENSOR / LCD -------------------
 DHT dht(PIN_DHT, DHT22);
@@ -99,6 +101,7 @@ void setup() {
 
   dht.begin();
 
+  Wire.begin(PIN_SDA_LCD, PIN_SCL_LCD);   // eksplisit set pin I2C LCD: SDA=21, SCL=22
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
